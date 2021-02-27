@@ -37,3 +37,8 @@
 >
 
 <!ELEMENT otherwise (#PCDATA|out|if|select)*>
+
+<!ELEMENT out EMPTY>
+<!ATTLIST out
+    value CDATA #REQUIRED
+>

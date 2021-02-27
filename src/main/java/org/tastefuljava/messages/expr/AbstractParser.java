@@ -3,16 +3,13 @@ package org.tastefuljava.messages.expr;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.tastefuljava.messages.util.Converter;
 import org.tastefuljava.messages.util.Reflection;
 
 public abstract class AbstractParser {
-    private static Object[] EMPTY_ARRAY = {};
+    private static final Object[] EMPTY_ARRAY = {};
 
     protected CompilationContext context;
-    private int varCount;
 
     public abstract Expression parse() throws IOException;
 

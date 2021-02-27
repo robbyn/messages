@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE messages
     PUBLIC '-//tastefuljava.org//Message File 1.0//EN' 'messages.dtd'>
-<messages>
+<messages default-language="fr">
     <message name="appNotFound" parameters="app">
         <text language="fr">
-            Application inconnue: <out value="enquote(app.name)"/>.
+            Application inconnue: <out value="app"/>.
         </text>
     </message>
 </messages>

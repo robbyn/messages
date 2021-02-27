@@ -27,7 +27,7 @@ public class ArithmeticTest {
         test.setLongVal(4);
         test.setShortVal((short)4);
         test.setStringVal("Hello world!!!");
-        cxt.addVariable("test");
+        cxt.addVariable(0, "test");
         eval.add(0, test);
     }
 

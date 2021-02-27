@@ -6,11 +6,9 @@ import java.util.List;
 public class EvaluationContext {
     private final List<Object> locals = new ArrayList<>();
     private final EvaluationContext link;
-    private final int level;
 
     public EvaluationContext(EvaluationContext link) {
         this.link = link;
-        this.level = link == null ? 0 : link.level+1;
     }
 
     public EvaluationContext() {
@@ -34,9 +32,8 @@ public class EvaluationContext {
 
     private List<Object> getScope(int level) {
         EvaluationContext cxt = this;
-        int delta = this.level-level;
-        while (delta > 0) {
-            --delta;
+        while (level > 0) {
+            --level;
             cxt = cxt.link;
         }
         return cxt.locals;

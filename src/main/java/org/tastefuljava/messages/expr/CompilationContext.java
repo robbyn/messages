@@ -18,8 +18,12 @@ public class CompilationContext {
         this(null);
     }
 
-    public int level() {
+    public int getLevel() {
         return level;
+    }
+
+    public CompilationContext getLink() {
+        return link;
     }
 
     public Expression resolve(String name) {
@@ -38,8 +42,7 @@ public class CompilationContext {
         scope.put(name, (c) -> value);
     }
 
-    public int addVariable(String name) {
-        int level = level();
+    public int addVariable(int level, String name) {
         int addr = varCount++;
         Expression expr = (c) -> {
             return c.get(level, addr);

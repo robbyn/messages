@@ -1,6 +1,16 @@
 package org.tastefuljava.messages.xml;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import org.tastefuljava.messages.expr.CompilationContext;
+import org.tastefuljava.messages.expr.Expression;
+import org.tastefuljava.messages.expr.ExpressionCompiler;
+import org.tastefuljava.messages.expr.StandardContext;
+import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -10,8 +20,37 @@ public class MessageFileLoader extends DefaultHandler {
     private static final String DTD_SYSTEM_ID = "messages.dtd";
     private static final String DTD_PUBLIC_ID
             = "-//tastefuljava.org//Message File 1.0//EN";
+    private static final String[] EMPTY_LIST = {};
 
     private final StringBuilder buf = new StringBuilder();
+    private boolean wasBlank;
+    private boolean skipBlank;
+    private final Messages messages = new Messages();
+    private Message message;
+    private Sequence sequence;
+    private String textLanguage;
+    private String definitionName;
+
+    public static Messages loadMessages(InputStream stream) throws IOException {
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setValidating(true);
+            factory.setNamespaceAware(true);
+            SAXParser parser = factory.newSAXParser();
+            MessageFileLoader handler = new MessageFileLoader();
+            parser.parse(new InputSource(stream), handler);
+            return handler.messages;
+        } catch (SAXException | ParserConfigurationException e) {
+            throw new IOException(e.getMessage());
+        }
+    }
+
+    private final ExpressionCompiler comp = new ExpressionCompiler();
+    private CompilationContext context = new CompilationContext(
+            new StandardContext());
+    {
+        context.defineConst("messages", messages);
+    }
 
     @Override
     public InputSource resolveEntity(String publicId, String systemId)
@@ -35,5 +74,151 @@ public class MessageFileLoader extends DefaultHandler {
     @Override
     public void error(SAXParseException e) throws SAXException {
         throw new SAXException(e.getMessage());
+    }
+
+    @Override
+    public void startElement(String uri, String localName, String qName,
+            Attributes attrs) throws SAXException {
+        switch (qName) {
+            case "messages":
+                messages.setPrefix(attr(attrs, "prefix", ""));
+                messages.setDefaultLanguage(
+                        attr(attrs, "default-language", "en"));
+                break;
+
+            case "message":
+                message = new Message(
+                        messages.getPrefix() + attr(attrs, "name", ""),
+                        list(attrs, "parameters"));
+                context = new CompilationContext(context);
+                for (String parm: message.getParameters()) {
+                    context.addVariable(0, parm);
+                }
+                break;
+
+            case "definition": {
+                String name = attr(attrs, "name", "");
+                String value = attr(attrs, "value", null);
+                if (value == null) {
+                    definitionName = name;
+                } else {
+                    try {
+                        Expression expr = comp.compile(context, value);
+                        context.define(name, expr);
+                    } catch (IOException ex) {
+                        throw new SAXException(ex.getMessage());
+                    }
+                }
+                break;
+            }
+            case "description":
+                buf.setLength(0);
+                wasBlank = false;
+                skipBlank = true;
+                break;
+
+            case "text": {
+                textLanguage = attr(
+                        attrs, "language", messages.getDefaultLanguage());
+                sequence = new Sequence(null);
+                buf.setLength(0);
+                wasBlank = false;
+                skipBlank = true;
+                break;
+            }
+
+            case "out": {
+                if (wasBlank && !skipBlank) {
+                    buf.append(' ');
+                }
+                if (buf.length() > 0) {
+                    sequence.addText(buf.toString());
+                    buf.setLength(0);
+                }
+                wasBlank = false;
+                skipBlank = false;
+                String value = attr(attrs, "value", null);
+                try {
+                    Expression expr = comp.compile(context, value);
+                    sequence.add(expr);
+                } catch (IOException ex) {
+                    throw new SAXException(ex.getMessage());
+                }
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void endElement(String uri, String localName, String qName)
+            throws SAXException {
+        switch (qName) {
+            case "messages":
+                break;
+
+            case "message":
+                context = context.getLink();
+                messages.setMessage(message.getName(), message);
+                message = null;
+                break;
+
+            case "definition":
+                break;
+
+            case "description":
+                if (message != null) {
+                    message.setDescription(buf.toString());
+                } else {
+                    messages.setDescription(buf.toString());
+                }
+                break;
+
+            case "text":
+                if (buf.length() > 0) {
+                    sequence.addText(buf.toString());
+                    buf.setLength(0);
+                    wasBlank = false;
+                }
+                message.setText(textLanguage, sequence.toExpression());
+                sequence = sequence.getLink();
+                break;
+
+            case "out":
+                buf.setLength(0);
+                wasBlank = false;
+                skipBlank = false;
+                break;
+        }
+    }
+
+    @Override
+    public void characters(char[] ch, int start, int length)
+            throws SAXException {
+        int end = start + length;
+        for (int i = start; i < end; ++i) {
+            char c = ch[i];
+            if (Character.isWhitespace(c)) {
+                wasBlank = true;
+            } else {
+                if (wasBlank) {
+                    if (!skipBlank) {
+                        buf.append(' ');
+                    }
+                    wasBlank = false;
+                }
+                buf.append(c);
+                skipBlank = false;
+            }
+        }
+    }
+
+    private static String attr(Attributes attrs, String name, String def) {
+        String s = attrs.getValue(name);
+        return s != null ? s : def;
+    }
+
+    private static String[] list(Attributes attrs, String name) {
+        String s = attrs.getValue(name);
+        return s != null ? s.split("[,;]") : EMPTY_LIST;
     }
 }
