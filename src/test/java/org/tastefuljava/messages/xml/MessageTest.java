@@ -43,4 +43,14 @@ public class MessageTest {
         assertEquals("(1, 2, 3)", messages.format(
                 "list", null, Arrays.asList(1, 2, 3)));
     }
+
+    @Test
+    public void testLanguages() {
+        assertEquals("Hello Bob!!!", messages.format(
+                "hello", null, "Bob"));
+        assertEquals("Hello Bob!!!", messages.format(
+                "hello", "en", "Bob"));
+        assertEquals("Bonjour Bob!!!", messages.format(
+                "hello", "fr", "Bob"));
+    }
 }

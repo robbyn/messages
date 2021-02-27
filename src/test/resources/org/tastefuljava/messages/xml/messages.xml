@@ -55,4 +55,12 @@
             </list>)
         </text>
     </message>
+    <message name="hello" parameters="name">
+        <text language="en">
+            Hello <out value="name"/>!!!
+        </text>
+        <text language="fr">
+            Bonjour <out value="name"/>!!!
+        </text>
+    </message>
 </messages>
