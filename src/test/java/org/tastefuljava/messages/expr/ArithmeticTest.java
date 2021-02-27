@@ -74,8 +74,11 @@ public class ArithmeticTest {
         assertEquals("Hello world!!!", eval("test.stringVal"));
 
         assertTrue((boolean)eval("test.byteVal==-4"));
-        assertTrue((boolean)eval("test.doubleVal==4.0"));
-        assertTrue((boolean)eval("test.floatVal==4.0"));
+        assertTrue((boolean)eval("test.charVal==4"));
+        assertTrue((boolean)eval("test.charVal>3"));
+        assertTrue((boolean)eval("test.charVal<=5"));
+        assertTrue((boolean)eval("test.doubleVal==4"));
+        assertTrue((boolean)eval("test.floatVal==4"));
         assertTrue((boolean)eval("test.intVal==4"));
         assertTrue((boolean)eval("test.longVal==4"));
         assertTrue((boolean)eval("test.shortVal==4"));
