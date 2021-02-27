@@ -1,0 +1,151 @@
+options {
+    STATIC = false;
+    IGNORE_CASE = false;
+}
+
+PARSER_BEGIN(ExpressionParser)
+package org.tastefuljava.messages.expr.impl;
+import org.tastefuljava.messages.expr.Expression;
+import org.tastefuljava.messages.expr.AbstractParser;
+import org.tastefuljava.messages.expr.CompilationContext;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.List;
+import java.util.ArrayList;
+
+public class ExpressionParser extends AbstractParser {
+    @Override
+    public Expression parse() throws IOException {
+        try {
+            return expression();
+        } catch (ParseException e) {
+            throw new IOException(e.getMessage());
+        }
+    }
+}
+PARSER_END(ExpressionParser)
+
+SKIP: {
+    " " | "\t" | "\n" | "\r"
+}
+
+TOKEN : {
+    < OR: "|" ("|")?  >
+    | < AND: "&" ("&")? >
+    | < EQ: "=" ("=")? >
+    | < NE: "!=" >
+    | < LT: "<" >
+    | < LE: "<=" >
+    | < GT: ">" >
+    | < GE: ">=" >
+    | < PLUS: "+" >
+    | < MINUS: "-" >
+    | < TIMES: "*" >
+    | < DIV: "/" >
+    | < LPAR: "(" >
+    | < RPAR: ")" >
+    | < LINDEX: "[" >
+    | < RINDEX: "]" >
+    | < INT: (["0"-"9"])+ >
+    | < FLOAT: <INT> "." (["0"-"9"])* | "." (["0"-"9"])+ >
+    | < STRING:
+        "\""
+        (
+            (~["\"","\\","\n","\r"])
+        |
+            "\\" ["n","t","b","r","f","\\","'","\""]
+        )*
+        "\""
+    >
+    | < ID: ["A"-"Z","a"-"z","_"] (["0"-"9","A"-"Z","a"-"z","_"])* >
+    | < DOT: "." >
+    | < COMMA: "," >
+}
+
+Expression expression(): {
+    Expression e, d;
+} {
+    e=simpleExpression()
+    (
+        <EQ> d=simpleExpression() {e = equal(e,d);}
+    |   <NE> d=simpleExpression() {e = notEqual(e,d);}
+    |   <LT> d=simpleExpression() {e = less(e,d);}
+    |   <LE> d=simpleExpression() {e = lessEqual(e,d);}
+    |   <GT> d=simpleExpression() {e = greater(e,d);}
+    |   <GE> d=simpleExpression() {e = greaterEqual(e,d);}
+    )?
+    {return e;}
+}
+
+Expression simpleExpression(): {
+    Expression e, d;
+    boolean neg = false;
+} {
+    (<PLUS>|<MINUS> {neg=true;})?
+    e=term()
+    {if(neg){e = neg(e);}}
+    (
+        <PLUS> d=term() {e = add(e,d);}
+    |   <MINUS> d=term() {e = sub(e,d);}
+    |   <OR> d=term() {e = or(e,d);}
+    )*
+    {return e;}
+}
+
+Expression term(): {
+    Expression e, d;
+} {
+    e=factor()
+    (
+        <TIMES> d=factor() {e = mul(e,d);}
+    |   <DIV> d=factor() {e = div(e,d);}
+    |   <AND> d=factor() {e = and(e,d);}
+    )*
+    {return e;}
+}
+
+Expression factor(): {
+    Expression e;
+    String s;
+} {
+    (    s=<INT>.image {e = intNumber(Integer.parseInt(s));}
+    |   s=<FLOAT>.image {e = floatNumber(Double.parseDouble(s));}
+    |   s=<STRING>.image {e = string(s);}
+    |   <LPAR> e=expression() <RPAR>
+    |   s=<ID>.image {e = lookup(s);} (e=qualifier(e))*
+    )
+    {return e;}
+}
+
+Expression qualifier(Expression e): {
+    Expression d;
+    Expression[] parms;
+    String s;
+} {
+    (
+        <DOT> s=<ID>.image
+        (
+            parms=params() {e=invoke(e,s,parms);}
+        |   {e=prop(e,s);}
+        )
+    |   <LINDEX> d=expression() <RINDEX> {e=index(e,d);}
+    )
+    {return e;}
+}
+
+Expression[] params(): {
+    Expression e;
+    List<Expression> parms = new ArrayList<Expression>();
+} {
+    <LPAR>
+    (
+        e=expression() {parms.add(e);}
+        (<COMMA> e=expression() {parms.add(e);})*
+    )?
+    <RPAR>
+    {return parms.toArray(new Expression[parms.size()]);}
+}
