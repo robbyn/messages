@@ -2,7 +2,6 @@ package org.tastefuljava.messages.util;
 
 import java.io.IOException;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,9 +19,9 @@ public class ConverterTest {
 
     @Test
     public void testSimpleConversions() {
-        Object obj = Converter.INSTANCE.convert(4, Long.TYPE);
+        Object obj = Converter.INSTANCE.convert(4, Double.TYPE);
         assertNotNull(obj);
-        assertEquals(Long.class, obj.getClass());
-        assertEquals(4L, ((Long)obj).longValue());
+        assertEquals(Double.class, obj.getClass());
+        assertEquals(4.0, ((Double)obj).doubleValue());
     }
 }
