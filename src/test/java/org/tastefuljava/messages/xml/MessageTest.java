@@ -53,4 +53,15 @@ public class MessageTest {
         assertEquals("Bonjour Bob!!!", messages.format(
                 "hello", "fr", "Bob"));
     }
+
+
+    @Test
+    public void testText() {
+        assertEquals("(\"1\", \"2\", \"3\")", messages.format(
+                "list2", null, Arrays.asList(1, 2, 3)));
+        assertEquals("(1, 2, 3)", messages.format(
+                "list3", null, Arrays.asList(1, 2, 3)));
+        assertEquals("(\"1\", \"2\", \"3\")", messages.format(
+                "list4", null, Arrays.asList(1, 2, 3)));
+    }
 }
