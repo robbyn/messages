@@ -41,9 +41,9 @@
                 </when>
                 <otherwise>
                     something else
-                    (<if condition="b==4">
+                    <if condition="b==4">
                         four
-                    </if>)
+                    </if>
                 </otherwise>
             </select>)
         </text>
@@ -51,7 +51,8 @@
     <message name="list" parameters="list">
         <text language="en">
             (<list value="list" variable="elem">
-                <out value="elem"/></list>)
+                <out value="elem"/>
+            </list>)
         </text>
     </message>
 </messages>

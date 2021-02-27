@@ -208,6 +208,7 @@ public class MessageFileLoader extends DefaultHandler {
                 select.endWhen(expr);
                 text.add(select.toExpression());
                 select = select.getLink();
+                endInTextElement();
                 break;
             }
 
@@ -234,6 +235,7 @@ public class MessageFileLoader extends DefaultHandler {
                 Expression expr = endText();
                 text.add(list.toExpression(expr));
                 list = list.getLink();
+                endInTextElement();
                 break;
             }
         }

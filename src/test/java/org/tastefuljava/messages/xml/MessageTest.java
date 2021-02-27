@@ -32,9 +32,9 @@ public class MessageTest {
         assertEquals("(zero three)", messages.format("select", null, 0, 3));
         assertEquals("(zero something else)",
                 messages.format("select", null, 0, -1));
-        assertEquals("(something else ())",
+        assertEquals("(something else )",
                 messages.format("select", null, 4, 3));
-        assertEquals("(something else (four))",
+        assertEquals("(something else four)",
                 messages.format("select", null, 4, 4));
     }
 
