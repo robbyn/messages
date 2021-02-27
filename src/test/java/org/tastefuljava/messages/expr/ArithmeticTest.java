@@ -1,9 +1,5 @@
 package org.tastefuljava.messages.expr;
 
-import org.tastefuljava.messages.expr.Expression;
-import org.tastefuljava.messages.expr.EvaluationContext;
-import org.tastefuljava.messages.expr.CompilationContext;
-import org.tastefuljava.messages.expr.ExpressionCompiler;
 import java.io.IOException;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,12 +14,16 @@ public class ArithmeticTest {
 
     @BeforeEach
     public void setUp() {
+        cxt = new CompilationContext();
         comp = new ExpressionCompiler();
+        eval = new EvaluationContext();
     }
 
     @AfterEach
     public void tearDown() throws IOException {
+        eval = null;
         comp = null;
+        cxt = null;
     }
 
     @Test

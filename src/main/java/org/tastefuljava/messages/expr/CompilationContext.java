@@ -6,10 +6,12 @@ import java.util.Map;
 public class CompilationContext {
     private final Map<String,Expression> scope = new HashMap<>();
     private final CompilationContext link;
+    private final int level;
     private int varCount;
 
     public CompilationContext(CompilationContext link) {
         this.link = link;
+        this.level = link == null ? 0 : link.level+1;
     }
 
     public CompilationContext() {
@@ -17,7 +19,7 @@ public class CompilationContext {
     }
 
     public int level() {
-        return link == null ? 0 : link.level()+1;
+        return level;
     }
 
     public Expression resolve(String name) {
