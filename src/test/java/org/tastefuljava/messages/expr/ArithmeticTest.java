@@ -17,7 +17,7 @@ public class ArithmeticTest {
     public void setUp() {
         cxt = new StandardContext();
         comp = new ExpressionCompiler();
-        eval = new EvaluationContext();
+        eval = new EvaluationContext(0);
         TestData test = new TestData();
         test.setByteVal((byte)-4);
         test.setCharVal((char)4);
@@ -27,8 +27,8 @@ public class ArithmeticTest {
         test.setLongVal(4);
         test.setShortVal((short)4);
         test.setStringVal("Hello world!!!");
-        cxt.addVariable(0, "test");
-        eval.add(0, test);
+        cxt.addVariable("test");
+        eval.add(test);
     }
 
     @AfterEach

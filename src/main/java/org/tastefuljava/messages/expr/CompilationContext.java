@@ -42,12 +42,13 @@ public class CompilationContext {
         scope.put(name, (c) -> value);
     }
 
-    public int addVariable(int level, String name) {
+    public int addVariable(String name) {
         int addr = varCount++;
-        Expression expr = (c) -> {
-            return c.get(level, addr);
-        };
-        define(name, expr);
+        define(name, varExpression(level, addr));
         return addr;
+    }
+
+    private static Expression varExpression(int level, int addr) {
+        return (c) -> c.get(level, addr);
     }
 }

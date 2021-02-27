@@ -2,7 +2,6 @@ package org.tastefuljava.messages.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -28,9 +27,17 @@ public class MessageFileLoader extends DefaultHandler {
     private final Messages messages = new Messages();
     private Message message;
     private TextBuilder text;
+    private ListBuilder list;
     private SelectBuilder select;
     private String textLanguage;
     private String definitionName;
+
+    private final ExpressionCompiler comp = new ExpressionCompiler();
+    private CompilationContext context = new CompilationContext(
+            new StandardContext());
+    {
+        context.defineConst("messages", messages);
+    }
 
     public static Messages loadMessages(InputStream stream) throws IOException {
         try {
@@ -44,13 +51,6 @@ public class MessageFileLoader extends DefaultHandler {
         } catch (SAXException | ParserConfigurationException e) {
             throw new IOException(e.getMessage());
         }
-    }
-
-    private final ExpressionCompiler comp = new ExpressionCompiler();
-    private CompilationContext context = new CompilationContext(
-            new StandardContext());
-    {
-        context.defineConst("messages", messages);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class MessageFileLoader extends DefaultHandler {
                         list(attrs, "parameters"));
                 context = new CompilationContext(context);
                 for (String parm: message.getParameters()) {
-                    context.addVariable(0, parm);
+                    context.addVariable(parm);
                 }
                 break;
 
@@ -130,6 +130,15 @@ public class MessageFileLoader extends DefaultHandler {
                 break;
             }
 
+            case "if": {
+                startInTextElement();
+                select = new SelectBuilder(select);
+                String cond = attr(attrs, "condition", null);
+                select.startWhen(compileExpr(cond));
+                startText();
+                break;
+            }
+
             case "select":
                 startInTextElement();
                 select = new SelectBuilder(select);
@@ -145,6 +154,18 @@ public class MessageFileLoader extends DefaultHandler {
             case "otherwise":
                 startText();
                 break;
+
+            case "list": {
+                startInTextElement();
+                String value = attr(attrs, "value", null);
+                String var = attr(attrs, "variable", null);
+                String sep = attr(attrs, "separator", ", ");
+                list = new ListBuilder(compileExpr(value), var, sep, list);
+                startText();
+                context = new CompilationContext(context);
+                context.addVariable(var);
+                break;
+            }
         }
     }
 
@@ -182,6 +203,14 @@ public class MessageFileLoader extends DefaultHandler {
                 endInTextElement();
                 break;
 
+            case "if": {
+                Expression expr = endText();
+                select.endWhen(expr);
+                text.add(select.toExpression());
+                select = select.getLink();
+                break;
+            }
+
             case "select":
                 endInTextElement();
                 text.add(select.toExpression());
@@ -197,6 +226,14 @@ public class MessageFileLoader extends DefaultHandler {
             case "otherwise": {
                 Expression expr = endText();
                 select.othewise(expr);
+                break;
+            }
+
+            case "list": {
+                context = context.getLink();
+                Expression expr = endText();
+                text.add(list.toExpression(expr));
+                list = list.getLink();
                 break;
             }
         }

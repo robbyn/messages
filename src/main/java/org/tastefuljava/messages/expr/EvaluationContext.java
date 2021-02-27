@@ -6,24 +6,26 @@ import java.util.List;
 public class EvaluationContext {
     private final List<Object> locals = new ArrayList<>();
     private final EvaluationContext link;
+    private final int level;
 
     public EvaluationContext(EvaluationContext link) {
-        this.link = link;
+        this(link, link == null ? 0 : link.level+1);
     }
 
-    public EvaluationContext() {
-        this(null);
+    public EvaluationContext(int level) {
+        this(null, level);
+    }
+
+    private EvaluationContext(EvaluationContext link, int level) {
+        this.link = link;
+        this.level = level;
     }
 
     public Object get(int level, int addr) {
         return getScope(level).get(addr);
     }
 
-    public void set(int level, int addr, Object value) {
-        getScope(level).set(addr, value);
-    }
-
-    public int add(int level, Object value) {
+    public int add(Object value) {
         List<Object> scope =  getScope(level);
         int result = scope.size();
         scope.add(value);
@@ -32,8 +34,7 @@ public class EvaluationContext {
 
     private List<Object> getScope(int level) {
         EvaluationContext cxt = this;
-        while (level > 0) {
-            --level;
+        while (level < cxt.level) {
             cxt = cxt.link;
         }
         return cxt.locals;

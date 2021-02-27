@@ -1,6 +1,7 @@
 package org.tastefuljava.messages.xml;
 
 import java.io.IOException;
+import java.util.Arrays;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,15 @@ public class MessageTest {
         assertEquals("(zero three)", messages.format("select", null, 0, 3));
         assertEquals("(zero something else)",
                 messages.format("select", null, 0, -1));
-        assertEquals("(something else)",
+        assertEquals("(something else ())",
                 messages.format("select", null, 4, 3));
+        assertEquals("(something else (four))",
+                messages.format("select", null, 4, 4));
+    }
+
+    @Test
+    public void testList() {
+        assertEquals("(1, 2, 3)", messages.format(
+                "list", null, Arrays.asList(1, 2, 3)));
     }
 }

@@ -19,26 +19,33 @@
     parameters CDATA #IMPLIED
 >
 
-<!ELEMENT text (#PCDATA|out|if|select)*>
+<!ELEMENT text (#PCDATA|out|if|select|list)*>
 <!ATTLIST text
     language CDATA #REQUIRED
 >
 
-<!ELEMENT if (#PCDATA|out|if|select)*>
+<!ELEMENT if (#PCDATA|out|if|select|list)*>
 <!ATTLIST if
     condition CDATA #REQUIRED
 >
 
 <!ELEMENT select (when+,otherwise?)>
 
-<!ELEMENT when (#PCDATA|out|if|select)*>
+<!ELEMENT when (#PCDATA|out|if|select|list)*>
 <!ATTLIST when
     condition CDATA #REQUIRED
 >
 
-<!ELEMENT otherwise (#PCDATA|out|if|select)*>
+<!ELEMENT otherwise (#PCDATA|out|if|select|list)*>
 
 <!ELEMENT out EMPTY>
 <!ATTLIST out
     value CDATA #REQUIRED
+>
+
+<!ELEMENT list (#PCDATA|out|if|select|list)*>
+<!ATTLIST list
+    value CDATA #REQUIRED
+    variable CDATA #REQUIRED
+    separator CDATA #IMPLIED
 >

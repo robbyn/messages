@@ -43,9 +43,9 @@ public class Message {
                     "Mauvais nombre de paramètres: attendu " + expPar
                             + " reçu: " + parms.length);
         }
-        EvaluationContext cxt = new EvaluationContext();
+        EvaluationContext cxt = new EvaluationContext(2);
         for (int i = 0; i < parms.length; ++i) {
-            cxt.add(0, parms[i]);
+            cxt.add(parms[i]);
         }
         Expression text = null;
         if (language != null) {
