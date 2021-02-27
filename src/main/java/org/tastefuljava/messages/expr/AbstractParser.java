@@ -33,6 +33,9 @@ public abstract class AbstractParser {
             if (b == null) {
                 return null;
             }
+            if (a.getClass() == b.getClass()) {
+                return a.equals(b);
+            }
             if (a instanceof Integer && b instanceof Integer) {
                 return a.equals(b);
             }
@@ -58,6 +61,9 @@ public abstract class AbstractParser {
             Object b = d.evaluate(c);
             if (b == null) {
                 return null;
+            }
+            if (a.getClass() == b.getClass()) {
+                return a.equals(b);
             }
             if (a instanceof Integer && b instanceof Integer) {
                 return !a.equals(b);

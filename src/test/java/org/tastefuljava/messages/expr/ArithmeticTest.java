@@ -80,6 +80,7 @@ public class ArithmeticTest {
         assertTrue((boolean)eval("test.longVal==4"));
         assertTrue((boolean)eval("test.shortVal==4"));
         assertTrue((boolean)eval("test.stringVal==\"Hello world!!!\""));
+        assertTrue((boolean)eval("test.charVal==test.getCharVal()"));
     }
 
     private Object eval(String s) throws IOException {
