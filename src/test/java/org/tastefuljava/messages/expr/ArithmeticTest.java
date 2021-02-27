@@ -2,7 +2,6 @@ package org.tastefuljava.messages.expr;
 
 import java.io.IOException;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,7 +15,7 @@ public class ArithmeticTest {
 
     @BeforeEach
     public void setUp() {
-        cxt = new CompilationContext();
+        cxt = new StandardContext();
         comp = new ExpressionCompiler();
         eval = new EvaluationContext();
         TestData test = new TestData();
@@ -72,6 +71,8 @@ public class ArithmeticTest {
         assertEquals(4l, eval("test.longVal"));
         assertEquals((short)4, eval("test.shortVal"));
         assertEquals("Hello world!!!", eval("test.stringVal"));
+        assertEquals(true, eval("true"));
+        assertEquals(false, eval("false"));
 
         assertTrue((boolean)eval("test.byteVal==-4"));
         assertTrue((boolean)eval("test.charVal==4"));
@@ -84,6 +85,9 @@ public class ArithmeticTest {
         assertTrue((boolean)eval("test.shortVal==4"));
         assertTrue((boolean)eval("test.stringVal==\"Hello world!!!\""));
         assertTrue((boolean)eval("test.charVal==test.getCharVal()"));
+        assertTrue((boolean)eval("(test.charVal==test.getCharVal())==true"));
+        assertTrue((boolean)eval("(test.charVal==test.getCharVal())!=false"));
+        assertTrue((boolean)eval("true!=false"));
     }
 
     private Object eval(String s) throws IOException {
