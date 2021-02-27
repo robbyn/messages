@@ -1,8 +1,15 @@
 package org.tastefuljava.messages.expr;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.tastefuljava.messages.util.Reflection;
 
 public abstract class AbstractParser {
+    private static Object[] EMPTY_ARRAY = {};
+
     protected CompilationContext context;
     private int varCount;
 
@@ -14,10 +21,6 @@ public abstract class AbstractParser {
 
     public void setContext(CompilationContext context) {
         this.context = context;
-    }
-
-    public Expression addVariable(String name) {
-        return context.addVariable(name);
     }
 
     protected Expression equal(Expression e, Expression d) {
@@ -386,7 +389,15 @@ public abstract class AbstractParser {
             if (o == null) {
                 return null;
             }
-            throw new UnsupportedOperationException("prop not implemented yet");
+            Method getter = Reflection.getPropGetter(o.getClass(), name);
+            if (getter == null) {
+                return null;
+            }
+            try {
+                return getter.invoke(o, EMPTY_ARRAY);
+            } catch (IllegalAccessException | InvocationTargetException ex) {
+                throw new RuntimeException(ex.getMessage());
+            }
         };
     }
 
@@ -397,8 +408,11 @@ public abstract class AbstractParser {
             if (o == null) {
                 return null;
             }
-            throw new UnsupportedOperationException(
-                    "invoke not implemented yet");
+            Object[] args = new Object[parms.length];
+            for (int i = 0; i < args.length; ++i) {
+                args[i] = parms[i].evaluate(c);
+            }
+            return Reflection.invokeMethod(o, name, args);
         };
     }
 

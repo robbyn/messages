@@ -34,13 +34,17 @@ public class CompilationContext {
         scope.put(name, value);
     }
 
-    public Expression addVariable(String name) {
+    public void defineConst(String name, Object value) {
+        scope.put(name, (c) -> value);
+    }
+
+    public int addVariable(String name) {
         int level = level();
         int addr = varCount++;
         Expression expr = (c) -> {
             return c.get(level, addr);
         };
         define(name, expr);
-        return expr;
+        return addr;
     }
 }

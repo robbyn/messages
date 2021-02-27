@@ -1,6 +1,7 @@
 package org.tastefuljava.messages.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -128,6 +129,36 @@ public class Reflection {
         } catch (NoSuchMethodException | SecurityException ex) {
             LOG.log(Level.SEVERE, null, ex);
             return null;
+        }
+    }
+
+    public static Object invokeMethod(Object obj, String name, Object... args) {
+        if (obj == null) {
+            return null;
+        }
+        try {
+            Class<?> clazz = obj.getClass();
+            OuterLoop:
+            for (Method method: clazz.getMethods()) {
+                if (!Modifier.isStatic(method.getModifiers())
+                        && method.getName().equals(name)
+                        && method.getParameterCount() == args.length) {
+                    Object[] convArgs = new Object[args.length];
+                    Class<?>[] argTypes = method.getParameterTypes();
+                    for (int i = 0; i < args.length; ++i) {
+                        Object arg = args[i];
+                        Class<?> type = argTypes[i];
+                        if (!Converter.INSTANCE.isConvertible(arg, type)) {
+                            continue OuterLoop;
+                        }
+                        convArgs[i] = Converter.INSTANCE.convert(arg, type);
+                    }
+                    return method.invoke(obj, convArgs);
+                }
+            }
+            return null;
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            throw new RuntimeException(ex.getMessage());
         }
     }
 
