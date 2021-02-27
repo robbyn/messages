@@ -2,7 +2,6 @@ package org.tastefuljava.messages.xml;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.tastefuljava.messages.expr.EvaluationContext;
 
 public class Messages {
     private String prefix;
