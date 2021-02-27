@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.tastefuljava.messages.util.Converter;
 import org.tastefuljava.messages.util.Reflection;
 
 public abstract class AbstractParser {
@@ -33,14 +34,14 @@ public abstract class AbstractParser {
             if (b == null) {
                 return null;
             }
-            if (a.getClass() == b.getClass()) {
+            Class<? extends Object> aClass = a.getClass();
+            Class<? extends Object> bClass = b.getClass();
+            if (aClass == bClass) {
                 return a.equals(b);
-            }
-            if (a instanceof Integer && b instanceof Integer) {
-                return a.equals(b);
-            }
-            if (a instanceof Number && b instanceof Number) {
-                return ((Number)a).doubleValue() == ((Number)b).doubleValue();
+            } else if (Converter.INSTANCE.isConvertible(b, aClass)) {
+                return a.equals(Converter.INSTANCE.convert(b, aClass));
+            } else if (Converter.INSTANCE.isConvertible(a, bClass)) {
+                return Converter.INSTANCE.convert(a, bClass).equals(b);
             }
             if (a instanceof String) {
                 return ((String)a).equals(b.toString());
@@ -62,14 +63,14 @@ public abstract class AbstractParser {
             if (b == null) {
                 return null;
             }
-            if (a.getClass() == b.getClass()) {
-                return a.equals(b);
-            }
-            if (a instanceof Integer && b instanceof Integer) {
+            Class<? extends Object> aClass = a.getClass();
+            Class<? extends Object> bClass = b.getClass();
+            if (aClass == bClass) {
                 return !a.equals(b);
-            }
-            if (a instanceof Number && b instanceof Number) {
-                return ((Number)a).doubleValue() != ((Number)b).doubleValue();
+            } else if (Converter.INSTANCE.isConvertible(b, aClass)) {
+                return !a.equals(Converter.INSTANCE.convert(b, aClass));
+            } else if (Converter.INSTANCE.isConvertible(a, bClass)) {
+                return !Converter.INSTANCE.convert(a, bClass).equals(b);
             }
             if (a instanceof String) {
                 return !((String)a).equals(b.toString());
@@ -91,20 +92,27 @@ public abstract class AbstractParser {
             if (b == null) {
                 return null;
             }
-            if (a instanceof Integer && b instanceof Integer) {
-                return (Integer)a < (Integer)b;
+            Integer r = compare(a, b);
+            if (r == null) {
+                return null;
             }
-            if (a instanceof Number && b instanceof Number) {
-                return ((Number)a).doubleValue() < ((Number)b).doubleValue();
-            }
-            if (a instanceof String) {
-                return ((String)a).compareTo(b.toString()) < 0;
-            }
-            if (b instanceof String) {
-                return a.toString().compareTo((String)b) < 0;
-            }
-            return null;
+            return r < 0;
         };
+    }
+
+    private Integer compare(Object a, Object b) {
+        Class<? extends Object> aClass = a.getClass();
+        Class<? extends Object> bClass = b.getClass();
+        if (Comparable.class.isAssignableFrom(aClass)
+                && Converter.INSTANCE.isConvertible(b, aClass)) {
+            return ((Comparable)a).compareTo(
+                    Converter.INSTANCE.convert(b, aClass));
+        } else if (Comparable.class.isAssignableFrom(bClass)
+                && Converter.INSTANCE.isConvertible(a, bClass)) {
+            return ((Comparable)Converter.INSTANCE.convert(a, bClass))
+                    .compareTo(b);
+        }
+        return null;
     }
 
     protected Expression lessEqual(Expression e, Expression d) {
@@ -117,19 +125,11 @@ public abstract class AbstractParser {
             if (b == null) {
                 return null;
             }
-            if (a instanceof Integer && b instanceof Integer) {
-                return (Integer)a <= (Integer)b;
+            Integer r = compare(a, b);
+            if (r == null) {
+                return null;
             }
-            if (a instanceof Number && b instanceof Number) {
-                return ((Number)a).doubleValue() <= ((Number)b).doubleValue();
-            }
-            if (a instanceof String) {
-                return ((String)a).compareTo(b.toString()) <= 0;
-            }
-            if (b instanceof String) {
-                return a.toString().compareTo((String)b) <= 0;
-            }
-            return null;
+            return r <= 0;
         };
     }
 
@@ -143,19 +143,11 @@ public abstract class AbstractParser {
             if (b == null) {
                 return null;
             }
-            if (a instanceof Integer && b instanceof Integer) {
-                return (Integer)a > (Integer)b;
+            Integer r = compare(a, b);
+            if (r == null) {
+                return null;
             }
-            if (a instanceof Number && b instanceof Number) {
-                return ((Number)a).doubleValue() > ((Number)b).doubleValue();
-            }
-            if (a instanceof String) {
-                return ((String)a).compareTo(b.toString()) > 0;
-            }
-            if (b instanceof String) {
-                return a.toString().compareTo((String)b) > 0;
-            }
-            return null;
+            return r > 0;
         };
     }
 
@@ -169,19 +161,11 @@ public abstract class AbstractParser {
             if (b == null) {
                 return null;
             }
-            if (a instanceof Integer && b instanceof Integer) {
-                return (Integer)a >= (Integer)b;
+            Integer r = compare(a, b);
+            if (r == null) {
+                return null;
             }
-            if (a instanceof Number && b instanceof Number) {
-                return ((Number)a).doubleValue() >= ((Number)b).doubleValue();
-            }
-            if (a instanceof String) {
-                return ((String)a).compareTo(b.toString()) >= 0;
-            }
-            if (b instanceof String) {
-                return a.toString().compareTo((String)b) >= 0;
-            }
-            return null;
+            return r >= 0;
         };
     }
 
