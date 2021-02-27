@@ -27,7 +27,8 @@ public class MessageFileLoader extends DefaultHandler {
     private boolean skipBlank;
     private final Messages messages = new Messages();
     private Message message;
-    private Sequence sequence;
+    private TextBuilder text;
+    private SelectBuilder select;
     private String textLanguage;
     private String definitionName;
 
@@ -102,15 +103,12 @@ public class MessageFileLoader extends DefaultHandler {
                 if (value == null) {
                     definitionName = name;
                 } else {
-                    try {
-                        Expression expr = comp.compile(context, value);
-                        context.define(name, expr);
-                    } catch (IOException ex) {
-                        throw new SAXException(ex.getMessage());
-                    }
+                    Expression expr = compileExpr(value);
+                    context.define(name, expr);
                 }
                 break;
             }
+ 
             case "description":
                 buf.setLength(0);
                 wasBlank = false;
@@ -120,32 +118,33 @@ public class MessageFileLoader extends DefaultHandler {
             case "text": {
                 textLanguage = attr(
                         attrs, "language", messages.getDefaultLanguage());
-                sequence = new Sequence(null);
-                buf.setLength(0);
-                wasBlank = false;
-                skipBlank = true;
+                startText();
                 break;
             }
 
             case "out": {
-                if (wasBlank && !skipBlank) {
-                    buf.append(' ');
-                }
-                if (buf.length() > 0) {
-                    sequence.addText(buf.toString());
-                    buf.setLength(0);
-                }
-                wasBlank = false;
-                skipBlank = false;
+                startInTextElement();
                 String value = attr(attrs, "value", null);
-                try {
-                    Expression expr = comp.compile(context, value);
-                    sequence.add(expr);
-                } catch (IOException ex) {
-                    throw new SAXException(ex.getMessage());
-                }
+                Expression expr = compileExpr(value);
+                text.add(expr);
                 break;
             }
+
+            case "select":
+                startInTextElement();
+                select = new SelectBuilder(select);
+                break;
+
+            case "when": {
+                String cond = attr(attrs, "condition", null);
+                select.startWhen(compileExpr(cond));
+                startText();
+                break;
+            }
+
+            case "otherwise":
+                startText();
+                break;
         }
     }
 
@@ -173,22 +172,78 @@ public class MessageFileLoader extends DefaultHandler {
                 }
                 break;
 
-            case "text":
-                if (buf.length() > 0) {
-                    sequence.addText(buf.toString());
-                    buf.setLength(0);
-                    wasBlank = false;
-                }
-                message.setText(textLanguage, sequence.toExpression());
-                sequence = sequence.getLink();
+            case "text": {
+                Expression expr = endText();
+                message.setText(textLanguage, expr);
                 break;
+            }
 
             case "out":
-                buf.setLength(0);
-                wasBlank = false;
-                skipBlank = false;
+                endInTextElement();
                 break;
+
+            case "select":
+                endInTextElement();
+                text.add(select.toExpression());
+                select = select.getLink();
+                break;
+
+            case "when": {
+                Expression expr = endText();
+                select.endWhen(expr);
+                break;
+            }
+
+            case "otherwise": {
+                Expression expr = endText();
+                select.othewise(expr);
+                break;
+            }
         }
+    }
+
+    private Expression compileExpr(String value) throws SAXException {
+        try {
+            return comp.compile(context, value);
+        } catch (IOException ex) {
+            throw new SAXException(ex.getMessage());
+        }
+    }
+
+    private void startText() {
+        text = new TextBuilder(text);
+        buf.setLength(0);
+        wasBlank = false;
+        skipBlank = true;
+    }
+
+    private Expression endText() {
+        if (buf.length() > 0) {
+            text.addText(buf.toString());
+            buf.setLength(0);
+            wasBlank = false;
+        }
+        Expression expr = text.toExpression();
+        text = text.getLink();
+        return expr;
+    }
+
+    private void startInTextElement() {
+        if (wasBlank && !skipBlank) {
+            buf.append(' ');
+        }
+        if (buf.length() > 0) {
+            text.addText(buf.toString());
+            buf.setLength(0);
+        }
+        wasBlank = false;
+        skipBlank = false;
+    }
+
+    private void endInTextElement() {
+        buf.setLength(0);
+        wasBlank = false;
+        skipBlank = false;
     }
 
     @Override

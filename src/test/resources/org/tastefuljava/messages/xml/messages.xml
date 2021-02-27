@@ -1,10 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE messages
     PUBLIC '-//tastefuljava.org//Message File 1.0//EN' 'messages.dtd'>
-<messages default-language="fr">
+<messages default-language="en">
     <message name="appNotFound" parameters="app">
-        <text language="fr">
-            Application inconnue: <out value="app"/>.
+        <text language="en">
+            Unknown application: <out value="app"/>.
+        </text>
+    </message>
+    <message name="select" parameters="a,b">
+        <text language="en">
+            (<select>
+                <when condition="a==0">
+                    zero
+                    <select>
+                        <when condition="b==0">
+                            zero
+                        </when>
+                        <when condition="b==1">
+                            one
+                        </when>
+                        <when condition="b==2">
+                            two
+                        </when>
+                        <when condition="b==3">
+                            three
+                        </when>
+                        <otherwise>
+                            something else
+                        </otherwise>
+                    </select>
+                </when>
+                <when condition="a==1">
+                    one
+                </when>
+                <when condition="a==2">
+                    two
+                </when>
+                <when condition="a==3">
+                    three
+                </when>
+                <otherwise>
+                    something else
+                </otherwise>
+            </select>)
         </text>
     </message>
 </messages>

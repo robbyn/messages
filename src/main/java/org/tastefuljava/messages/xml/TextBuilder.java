@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import org.tastefuljava.messages.expr.Expression;
 
-public class Sequence {
-    private final Sequence link;
+public class TextBuilder {
+    private final TextBuilder link;
     private final List<Expression> expressions = new ArrayList<>();
 
-    public Sequence(Sequence link) {
+    public TextBuilder(TextBuilder link) {
         this.link = link;
     }
 
-    public Sequence getLink() {
+    public TextBuilder getLink() {
         return link;
     }
 

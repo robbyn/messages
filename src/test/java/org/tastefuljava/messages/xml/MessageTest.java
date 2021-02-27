@@ -22,7 +22,16 @@ public class MessageTest {
 
     @Test
     public void testSimple() {
-        assertEquals("Application inconnue: MyApp.",
+        assertEquals("Unknown application: MyApp.",
                 messages.format("appNotFound", null, "MyApp"));
+    }
+
+    @Test
+    public void testSelect() {
+        assertEquals("(zero three)", messages.format("select", null, 0, 3));
+        assertEquals("(zero something else)",
+                messages.format("select", null, 0, -1));
+        assertEquals("(something else)",
+                messages.format("select", null, 4, 3));
     }
 }
