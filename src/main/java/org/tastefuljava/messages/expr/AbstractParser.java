@@ -1,8 +1,11 @@
 package org.tastefuljava.messages.expr;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
 import org.tastefuljava.messages.util.Converter;
 import org.tastefuljava.messages.util.Reflection;
 
@@ -183,23 +186,27 @@ public abstract class AbstractParser {
         return (c) -> {
             Object a = e.evaluate(c);
             Object b = d.evaluate(c);
+            if (a == null) {
+                return b;
+            }
+            if (b == null) {
+                return a;
+            }
             if (a instanceof String)  {
                 return b == null ? a : (String)a + b.toString();
             }
             if (b instanceof String)  {
                 return a == null ? a : (String)a + b.toString();
             }
-            if (a == null) {
-                return b == null;
+            if (Converter.INSTANCE.isConvertible(a, int.class)
+                    && Converter.INSTANCE.isConvertible(b, int.class)) {
+                return Converter.INSTANCE.convert(a, int.class)
+                        + Converter.INSTANCE.convert(b, int.class);
             }
-            if (b == null) {
-                return null;
-            }
-            if (a instanceof Integer && b instanceof Integer) {
-                return (Integer)a + (Integer)b;
-            }
-            if (a instanceof Number && b instanceof Number) {
-                return ((Number)a).doubleValue() + ((Number)b).doubleValue();
+            if (Converter.INSTANCE.isConvertible(a, double.class)
+                    && Converter.INSTANCE.isConvertible(b, double.class)) {
+                return Converter.INSTANCE.convert(a, double.class)
+                        + Converter.INSTANCE.convert(b, double.class);
             }
             return null;
         };
@@ -215,11 +222,15 @@ public abstract class AbstractParser {
             if (b == null) {
                 return null;
             }
-            if (a instanceof Integer && b instanceof Integer) {
-                return (Integer)a - (Integer)b;
+            if (Converter.INSTANCE.isConvertible(a, int.class)
+                    && Converter.INSTANCE.isConvertible(b, int.class)) {
+                return Converter.INSTANCE.convert(a, int.class)
+                        - Converter.INSTANCE.convert(b, int.class);
             }
-            if (a instanceof Number && b instanceof Number) {
-                return ((Number)a).doubleValue() - ((Number)b).doubleValue();
+            if (Converter.INSTANCE.isConvertible(a, double.class)
+                    && Converter.INSTANCE.isConvertible(b, double.class)) {
+                return Converter.INSTANCE.convert(a, double.class)
+                        - Converter.INSTANCE.convert(b, double.class);
             }
             return null;
         };
@@ -235,11 +246,15 @@ public abstract class AbstractParser {
             if (b == null) {
                 return null;
             }
-            if (a instanceof Integer && b instanceof Integer) {
-                return (Integer)a * (Integer)b;
+            if (Converter.INSTANCE.isConvertible(a, int.class)
+                    && Converter.INSTANCE.isConvertible(b, int.class)) {
+                return Converter.INSTANCE.convert(a, int.class)
+                        * Converter.INSTANCE.convert(b, int.class);
             }
-            if (a instanceof Number && b instanceof Number) {
-                return ((Number)a).doubleValue() * ((Number)b).doubleValue();
+            if (Converter.INSTANCE.isConvertible(a, double.class)
+                    && Converter.INSTANCE.isConvertible(b, double.class)) {
+                return Converter.INSTANCE.convert(a, double.class)
+                        * Converter.INSTANCE.convert(b, double.class);
             }
             return null;
         };
@@ -255,11 +270,15 @@ public abstract class AbstractParser {
             if (b == null) {
                 return null;
             }
-            if (a instanceof Integer && b instanceof Integer) {
-                return (Integer)a / (Integer)b;
+            if (Converter.INSTANCE.isConvertible(a, int.class)
+                    && Converter.INSTANCE.isConvertible(b, int.class)) {
+                return Converter.INSTANCE.convert(a, int.class)
+                        / Converter.INSTANCE.convert(b, int.class);
             }
-            if (a instanceof Number && b instanceof Number) {
-                return ((Number)a).doubleValue() / ((Number)b).doubleValue();
+            if (Converter.INSTANCE.isConvertible(a, double.class)
+                    && Converter.INSTANCE.isConvertible(b, double.class)) {
+                return Converter.INSTANCE.convert(a, double.class)
+                        / Converter.INSTANCE.convert(b, double.class);
             }
             return null;
         };
@@ -410,8 +429,21 @@ public abstract class AbstractParser {
                 return null;
             }
             Object n = d.evaluate(c);
-            throw new UnsupportedOperationException(
-                    "index not implemented yet");
+            if (n == null) {
+                return null;
+            }
+            if (o instanceof Map) {
+                return ((Map)o).get(n);
+            }
+            if (Converter.INSTANCE.isConvertible(n, int.class)) {
+                int i = Converter.INSTANCE.convert(n, int.class);
+                if (o instanceof List) {
+                    return ((List)o).get(i);
+                } else {
+                    return Array.get(o, i);
+                }
+            }
+            return null;
         };
     }
 
