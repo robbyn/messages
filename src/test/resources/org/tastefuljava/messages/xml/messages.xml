@@ -80,4 +80,9 @@
             Bonjour <out value="name"/>!!!
         </text>
     </message>
+    <message name="index" parameters="a,i">
+        <text language="en">
+            <out value="a[i]"/>
+        </text>
+    </message>
 </messages>

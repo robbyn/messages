@@ -1,6 +1,10 @@
 package org.tastefuljava.messages.expr;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -90,10 +94,41 @@ public class ArithmeticTest {
         assertTrue((boolean)eval("true!=false"));
     }
 
+    @Test
+    public void testCollections() throws IOException {
+        int[] intArray = {1, 2, 3, 4};
+        Integer[] integerArray = {1, 2, 3, 4};
+        List<Integer> intList = Arrays.asList(integerArray);
+        Map<String,Integer> intMap = new HashMap<>();
+        intMap.put("one", 1);
+        intMap.put("two", 2);
+        intMap.put("three", 3);
+        intMap.put("four", 4);
+        assertEquals(2, evaln("a[b-1]", intArray, 2));
+        assertEquals(3, evaln("a[b-1]", integerArray, 3));
+        assertEquals(4, evaln("a[b-1]", intList, 4));
+        assertEquals(1, evaln("a[b]", intMap, "one"));
+    }
+
     private Object eval(String s) throws IOException {
         Expression e = comp.compile(cxt, s);
         Object v = e.evaluate(eval);
         return v;
     }
 
+    private Object evaln(String s, Object...parms) throws IOException {
+        CompilationContext cc = new CompilationContext(this.cxt);
+        char c = 'a';
+        for (int i = 0; i < parms.length; ++i) {
+            cc.addVariable(Character.toString(c));
+            ++c;
+        }
+        Expression e = comp.compile(cc, s);
+        EvaluationContext ec = new EvaluationContext(this.eval);
+        for (Object p: parms) {
+            ec.add(p);
+        }
+        Object r = e.evaluate(ec);
+        return r;
+    }
 }
