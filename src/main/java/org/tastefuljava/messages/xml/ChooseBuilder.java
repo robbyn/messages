@@ -3,17 +3,17 @@ package org.tastefuljava.messages.xml;
 import org.tastefuljava.messages.expr.Expression;
 import org.tastefuljava.messages.util.Converter;
 
-public class SelectBuilder {
-    private final SelectBuilder link;
+public class ChooseBuilder {
+    private final ChooseBuilder link;
     private When lastWhen = null;
     private Expression whenCondition;
     private Expression otherwise;
 
-    public SelectBuilder(SelectBuilder link) {
+    public ChooseBuilder(ChooseBuilder link) {
         this.link = link;
     }
 
-    public SelectBuilder getLink() {
+    public ChooseBuilder getLink() {
         return link;
     }
 

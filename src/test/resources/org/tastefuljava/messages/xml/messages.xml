@@ -7,12 +7,12 @@
             Unknown application: <out value="app"/>.
         </text>
     </message>
-    <message name="select" parameters="a,b">
+    <message name="choose" parameters="a,b">
         <text language="en">
-            (<select>
+            (<choose>
                 <when condition="a==0">
                     zero
-                    <select>
+                    <choose>
                         <when condition="b==0">
                             zero
                         </when>
@@ -28,7 +28,7 @@
                         <otherwise>
                             something else
                         </otherwise>
-                    </select>
+                    </choose>
                 </when>
                 <when condition="a==1">
                     one
@@ -45,7 +45,7 @@
                         four
                     </if>
                 </otherwise>
-            </select>)
+            </choose>)
         </text>
     </message>
     <message name="list" parameters="list">
@@ -81,6 +81,11 @@
         </text>
     </message>
     <message name="index" parameters="a,i">
+        <text language="en">
+            <out value="a[i]"/>
+        </text>
+    </message>
+    <message name="text" parameters="a,i">
         <text language="en">
             <out value="a[i]"/>
         </text>

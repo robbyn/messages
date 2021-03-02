@@ -28,14 +28,14 @@ public class MessageTest {
     }
 
     @Test
-    public void testSelect() {
-        assertEquals("(zero three)", messages.format("select", null, 0, 3));
+    public void testChoose() {
+        assertEquals("(zero three)", messages.format("choose", null, 0, 3));
         assertEquals("(zero something else)",
-                messages.format("select", null, 0, -1));
+                messages.format("choose", null, 0, -1));
         assertEquals("(something else )",
-                messages.format("select", null, 4, 3));
+                messages.format("choose", null, 4, 3));
         assertEquals("(something else four)",
-                messages.format("select", null, 4, 4));
+                messages.format("choose", null, 4, 4));
     }
 
     @Test

@@ -27,7 +27,7 @@ public class MessageFileLoader extends DefaultHandler {
     private Described descriptionHolder;
     private SequenceBuilder sequence;
     private ListBuilder list;
-    private SelectBuilder select;
+    private ChooseBuilder choose;
     private String textLanguage;
     private String definitionName;
 
@@ -131,21 +131,21 @@ public class MessageFileLoader extends DefaultHandler {
 
             case "if": {
                 startInSequenceElement();
-                select = new SelectBuilder(select);
+                choose = new ChooseBuilder(choose);
                 String cond = attr(attrs, "condition", null);
-                select.startWhen(compileExpr(cond));
+                choose.startWhen(compileExpr(cond));
                 startSequence();
                 break;
             }
 
-            case "select":
+            case "choose":
                 startInSequenceElement();
-                select = new SelectBuilder(select);
+                choose = new ChooseBuilder(choose);
                 break;
 
             case "when": {
                 String cond = attr(attrs, "condition", null);
-                select.startWhen(compileExpr(cond));
+                choose.startWhen(compileExpr(cond));
                 startSequence();
                 break;
             }
@@ -206,28 +206,28 @@ public class MessageFileLoader extends DefaultHandler {
 
             case "if": {
                 Expression expr = endSequence();
-                select.endWhen(expr);
-                sequence.add(select.toExpression());
-                select = select.getLink();
+                choose.endWhen(expr);
+                sequence.add(choose.toExpression());
+                choose = choose.getLink();
                 endInSequenceElement();
                 break;
             }
 
-            case "select":
+            case "choose":
                 endInSequenceElement();
-                sequence.add(select.toExpression());
-                select = select.getLink();
+                sequence.add(choose.toExpression());
+                choose = choose.getLink();
                 break;
 
             case "when": {
                 Expression expr = endSequence();
-                select.endWhen(expr);
+                choose.endWhen(expr);
                 break;
             }
 
             case "otherwise": {
                 Expression expr = endSequence();
-                select.othewise(expr);
+                choose.othewise(expr);
                 break;
             }
 
