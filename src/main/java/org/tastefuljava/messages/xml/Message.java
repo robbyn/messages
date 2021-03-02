@@ -5,10 +5,9 @@ import java.util.Map;
 import org.tastefuljava.messages.expr.EvaluationContext;
 import org.tastefuljava.messages.expr.Expression;
 
-public class Message {
+public class Message extends Described {
     private final String name;
     private final String[] parameters;
-    private String description;
     private final Map<String,Expression> texts = new HashMap<>();
 
     public Message(String name, String[] parameters) {
@@ -24,13 +23,6 @@ public class Message {
         return parameters.clone();
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public void setText(String language, Expression expr) {
         texts.put(language, expr);

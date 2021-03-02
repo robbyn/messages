@@ -21,10 +21,11 @@ public class MessageFileLoader extends DefaultHandler {
             = "-//tastefuljava.org//Message File 1.0//EN";
     private static final String[] EMPTY_LIST = {};
 
-    private final TextBuilder buf = new TextBuilder();
+    private final TextBuilder text = new TextBuilder();
     private final Messages messages = new Messages();
     private Message message;
-    private SequenceBuilder text;
+    private Described descriptionHolder;
+    private SequenceBuilder sequence;
     private ListBuilder list;
     private SelectBuilder select;
     private String textLanguage;
@@ -83,6 +84,7 @@ public class MessageFileLoader extends DefaultHandler {
                 messages.setPrefix(attr(attrs, "prefix", ""));
                 messages.setDefaultLanguage(
                         attr(attrs, "default-language", "en"));
+                descriptionHolder = messages;
                 break;
 
             case "message":
@@ -93,6 +95,7 @@ public class MessageFileLoader extends DefaultHandler {
                 for (String parm: message.getParameters()) {
                     context.addVariable(parm);
                 }
+                descriptionHolder = message;
                 break;
 
             case "definition": {
@@ -108,56 +111,56 @@ public class MessageFileLoader extends DefaultHandler {
             }
  
             case "description":
-                buf.start(true);
+                text.start(true);
                 break;
 
             case "text": {
                 textLanguage = attr(
                         attrs, "language", messages.getDefaultLanguage());
-                startText();
+                startSequence();
                 break;
             }
 
             case "out": {
-                startInTextElement();
+                startInSequenceElement();
                 String value = attr(attrs, "value", null);
                 Expression expr = compileExpr(value);
-                text.add(expr);
+                sequence.add(expr);
                 break;
             }
 
             case "if": {
-                startInTextElement();
+                startInSequenceElement();
                 select = new SelectBuilder(select);
                 String cond = attr(attrs, "condition", null);
                 select.startWhen(compileExpr(cond));
-                startText();
+                startSequence();
                 break;
             }
 
             case "select":
-                startInTextElement();
+                startInSequenceElement();
                 select = new SelectBuilder(select);
                 break;
 
             case "when": {
                 String cond = attr(attrs, "condition", null);
                 select.startWhen(compileExpr(cond));
-                startText();
+                startSequence();
                 break;
             }
 
             case "otherwise":
-                startText();
+                startSequence();
                 break;
 
             case "list": {
-                startInTextElement();
+                startInSequenceElement();
                 String value = attr(attrs, "value", null);
                 String var = attr(attrs, "variable", null);
                 String sep = attr(attrs, "separator", ", ");
                 list = new ListBuilder(compileExpr(value), var, sep, list);
-                startText();
+                startSequence();
                 context = new CompilationContext(context);
                 context.addVariable(var);
                 break;
@@ -170,68 +173,70 @@ public class MessageFileLoader extends DefaultHandler {
             throws SAXException {
         switch (qName) {
             case "messages":
+                descriptionHolder = null;
                 break;
 
             case "message":
                 context = context.getLink();
                 messages.setMessage(message.getName(), message);
                 message = null;
+                descriptionHolder = null;
                 break;
 
             case "definition":
                 break;
 
-            case "description":
-                if (message != null) {
-                    message.setDescription(buf.toString());
-                } else {
-                    messages.setDescription(buf.toString());
+            case "description": {
+                String s = text.end(true);
+                if (!s.isEmpty()) {
+                    descriptionHolder.setDescription(s);
                 }
                 break;
+            }
 
             case "text": {
-                Expression expr = endText();
+                Expression expr = endSequence();
                 message.setText(textLanguage, expr);
                 break;
             }
 
             case "out":
-                endInTextElement();
+                endInSequenceElement();
                 break;
 
             case "if": {
-                Expression expr = endText();
+                Expression expr = endSequence();
                 select.endWhen(expr);
-                text.add(select.toExpression());
+                sequence.add(select.toExpression());
                 select = select.getLink();
-                endInTextElement();
+                endInSequenceElement();
                 break;
             }
 
             case "select":
-                endInTextElement();
-                text.add(select.toExpression());
+                endInSequenceElement();
+                sequence.add(select.toExpression());
                 select = select.getLink();
                 break;
 
             case "when": {
-                Expression expr = endText();
+                Expression expr = endSequence();
                 select.endWhen(expr);
                 break;
             }
 
             case "otherwise": {
-                Expression expr = endText();
+                Expression expr = endSequence();
                 select.othewise(expr);
                 break;
             }
 
             case "list": {
                 context = context.getLink();
-                Expression expr = endText();
-                text.add(list.toExpression(expr));
+                Expression expr = endSequence();
+                sequence.add(list.toExpression(expr));
                 list = list.getLink();
-                endInTextElement();
+                endInSequenceElement();
                 break;
             }
         }
@@ -245,38 +250,36 @@ public class MessageFileLoader extends DefaultHandler {
         }
     }
 
-    private void startText() {
-        text = new SequenceBuilder(text);
-        buf.start(true);
+    private void startSequence() {
+        sequence = new SequenceBuilder(sequence);
+        text.start(true);
     }
 
-    private Expression endText() {
-        String s = buf.end(true);
-        if (buf.length() > 0) {
-            text.addText(buf.toString());
-            buf.setLength(0);
-            wasBlank = false;
+    private Expression endSequence() {
+        String s = text.end(true);
+        if (!s.isEmpty()) {
+            sequence.addText(s);
         }
-        Expression expr = text.toExpression();
-        text = text.getLink();
+        Expression expr = sequence.toExpression();
+        sequence = sequence.getLink();
         return expr;
     }
 
-    private void startInTextElement() {
-        String s = buf.end(false);
+    private void startInSequenceElement() {
+        String s = text.end(false);
         if (!s.isEmpty()) {
-            text.addText(s);
+            sequence.addText(s);
         }
     }
 
-    private void endInTextElement() {
-        buf.start(false);
+    private void endInSequenceElement() {
+        text.start(false);
     }
 
     @Override
     public void characters(char[] ch, int start, int length)
             throws SAXException {
-        buf.addChars(ch, start, length);
+        text.addChars(ch, start, length);
     }
 
     private static String attr(Attributes attrs, String name, String def) {

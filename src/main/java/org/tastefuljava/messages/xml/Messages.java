@@ -3,10 +3,9 @@ package org.tastefuljava.messages.xml;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Messages {
+public class Messages extends Described {
     private String prefix;
     private String defaultLanguage;
-    private String description;
     private final Map<String,Message> messages = new HashMap<>();
 
     public String getPrefix() {
@@ -23,14 +22,6 @@ public class Messages {
 
     public void setDefaultLanguage(String defaultLanguage) {
         this.defaultLanguage = defaultLanguage;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Message getMessage(String name) {
