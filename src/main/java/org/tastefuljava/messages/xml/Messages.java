@@ -39,4 +39,8 @@ public class Messages extends Described {
         }
         return msg.format(language, defaultLanguage, parms);
     }
+
+    public MessageFormatter getFormatter(String language) {
+        return (name, parms) -> format(name, language, parms);
+    }
 }
