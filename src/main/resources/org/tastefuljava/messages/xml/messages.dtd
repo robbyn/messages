@@ -2,7 +2,7 @@
 <!ELEMENT messages (description?,definition*,message*)>
 <!ATTLIST messages
     prefix CDATA #IMPLIED
-    default-language CDATA #IMPLIED
+    language CDATA #REQUIRED
 >
 
 <!ELEMENT description (#PCDATA)>
@@ -13,15 +13,10 @@
     value CDATA #IMPLIED
 >
 
-<!ELEMENT message (description?,text+)>
+<!ELEMENT message (#PCDATA|out|if|choose|list)*>
 <!ATTLIST message
     name CDATA #REQUIRED
     parameters CDATA #IMPLIED
->
-
-<!ELEMENT text (#PCDATA|out|if|choose|list)*>
-<!ATTLIST text
-    language CDATA #REQUIRED
 >
 
 <!ELEMENT if (#PCDATA|out|if|choose|list)*>

@@ -4,24 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Messages extends Described {
-    private String prefix;
-    private String defaultLanguage;
+    private String language;
     private final Map<String,Message> messages = new HashMap<>();
 
-    public String getPrefix() {
-        return prefix;
+    public String getLanguage() {
+        return language;
     }
 
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
-
-    public String getDefaultLanguage() {
-        return defaultLanguage;
-    }
-
-    public void setDefaultLanguage(String defaultLanguage) {
-        this.defaultLanguage = defaultLanguage;
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public Message getMessage(String name) {
@@ -32,15 +23,11 @@ public class Messages extends Described {
         messages.put(name, message);
     }
 
-    public String format(String name, String language, Object... parms) {
+    public String format(String name, Object... parms) {
         Message msg = messages.get(name);
         if (msg == null) {
             throw new IllegalArgumentException("Message inconnu: " + name);
         }
-        return msg.format(language, defaultLanguage, parms);
-    }
-
-    public MessageFormatter getFormatter(String language) {
-        return (name, parms) -> format(name, language, parms);
+        return msg.format(parms);
     }
 }

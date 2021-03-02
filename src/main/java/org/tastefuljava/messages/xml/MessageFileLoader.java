@@ -23,6 +23,7 @@ public class MessageFileLoader extends DefaultHandler {
 
     private final TextBuilder text = new TextBuilder();
     private final Messages messages = new Messages();
+    private String prefix;
     private Message message;
     private Described descriptionHolder;
     private SequenceBuilder sequence;
@@ -81,21 +82,10 @@ public class MessageFileLoader extends DefaultHandler {
             Attributes attrs) throws SAXException {
         switch (qName) {
             case "messages":
-                messages.setPrefix(attr(attrs, "prefix", ""));
-                messages.setDefaultLanguage(
-                        attr(attrs, "default-language", "en"));
+                prefix = attr(attrs, "prefix", "");
+                messages.setLanguage(
+                        attr(attrs, "language", "en"));
                 descriptionHolder = messages;
-                break;
-
-            case "message":
-                message = new Message(
-                        messages.getPrefix() + attr(attrs, "name", ""),
-                        list(attrs, "parameters"));
-                context = new CompilationContext(context);
-                for (String parm: message.getParameters()) {
-                    context.addVariable(parm);
-                }
-                descriptionHolder = message;
                 break;
 
             case "definition": {
@@ -109,17 +99,21 @@ public class MessageFileLoader extends DefaultHandler {
                 }
                 break;
             }
- 
+
+            case "message":
+                message = new Message(
+                        prefix + attr(attrs, "name", ""),
+                        list(attrs, "parameters"));
+                context = new CompilationContext(context);
+                for (String parm: message.getParameters()) {
+                    context.addVariable(parm);
+                }
+                startSequence();
+                break;
+
             case "description":
                 text.start(true);
                 break;
-
-            case "text": {
-                textLanguage = attr(
-                        attrs, "language", messages.getDefaultLanguage());
-                startSequence();
-                break;
-            }
 
             case "out": {
                 startInSequenceElement();
@@ -176,16 +170,6 @@ public class MessageFileLoader extends DefaultHandler {
                 descriptionHolder = null;
                 break;
 
-            case "message":
-                context = context.getLink();
-                messages.setMessage(message.getName(), message);
-                message = null;
-                descriptionHolder = null;
-                break;
-
-            case "definition":
-                break;
-
             case "description": {
                 String s = text.end(true);
                 if (!s.isEmpty()) {
@@ -194,9 +178,16 @@ public class MessageFileLoader extends DefaultHandler {
                 break;
             }
 
-            case "text": {
+            case "definition":
+                break;
+
+            case "message": {
+                context = context.getLink();
                 Expression expr = endSequence();
-                message.setText(textLanguage, expr);
+                message.setText(expr);
+                messages.setMessage(message.getName(), message);
+                message = null;
+                descriptionHolder = null;
                 break;
             }
 
