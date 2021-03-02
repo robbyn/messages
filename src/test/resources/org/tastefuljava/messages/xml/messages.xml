@@ -85,9 +85,17 @@
             <out value="a[i]"/>
         </text>
     </message>
-    <message name="text" parameters="a,i">
+    <message name="text" parameters="line1,line2,line3">
         <text language="en">
-            <out value="a[i]"/>
+            ----    Begin text    ----
+
+            <out value="line1"/>
+
+            <out value="line2"/>
+
+            <out value="line3"/>
+
+            ----    End text    ----
         </text>
     </message>
 </messages>

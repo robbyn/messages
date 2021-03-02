@@ -2,6 +2,7 @@ package org.tastefuljava.messages.xml;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +43,12 @@ public class MessageTest {
     public void testList() {
         assertEquals("(1, 2, 3)", messages.format(
                 "list", null, Arrays.asList(1, 2, 3)));
+        assertEquals("(\"1\", \"2\", \"3\")", messages.format(
+                "list2", null, Arrays.asList(1, 2, 3)));
+        assertEquals("(1, 2, 3)", messages.format(
+                "list3", null, Arrays.asList(1, 2, 3)));
+        assertEquals("(\"1\", \"2\", \"3\")", messages.format(
+                "list4", null, Arrays.asList(1, 2, 3)));
     }
 
     @Test
@@ -57,11 +64,12 @@ public class MessageTest {
 
     @Test
     public void testText() {
-        assertEquals("(\"1\", \"2\", \"3\")", messages.format(
-                "list2", null, Arrays.asList(1, 2, 3)));
-        assertEquals("(1, 2, 3)", messages.format(
-                "list3", null, Arrays.asList(1, 2, 3)));
-        assertEquals("(\"1\", \"2\", \"3\")", messages.format(
-                "list4", null, Arrays.asList(1, 2, 3)));
+        assertEquals(
+                "---- Begin text ----\n"
+                + "Line 1\nLine 2\nLine 3\n"
+                + "---- End text ----",
+                messages.format(
+                        "text", null, "Line 1", "Line 2", "Line 3"));
     }
 }
+
