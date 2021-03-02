@@ -1,46 +1,42 @@
 package org.tastefuljava.messages.xml;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.tastefuljava.messages.expr.Expression;
+import org.xml.sax.SAXException;
 
 public class TextBuilder {
-    private final TextBuilder link;
-    private final List<Expression> expressions = new ArrayList<>();
+    private final StringBuilder buf = new StringBuilder();
+    private boolean wasBlank;
+    private boolean skipBlank = true;
 
-    public TextBuilder(TextBuilder link) {
-        this.link = link;
+    public void start(boolean trimHead) {
+        buf.setLength(0);
+        wasBlank = false;
+        skipBlank = trimHead;
     }
 
-    public TextBuilder getLink() {
-        return link;
+    public String end(boolean trimTail) {
+        if (wasBlank && !skipBlank && !trimTail) {
+            buf.append(' ');
+        }
+        return buf.toString();
     }
 
-    public void add(Expression expr) {
-        expressions.add(expr);
-    }
-
-    public void addText(String text) {
-        expressions.add((c) -> text);
-    }
-
-    public Expression toExpression() {
-        return toExpression(expressions.toArray(
-                new Expression[expressions.size()]));
-    }
-
-    private static Expression toExpression(final Expression[] list) {
-        return (c) -> {
-            StringBuilder buf = new StringBuilder();
-            for (Expression e: list) {
-                if (e != null) {
-                    Object o = e.evaluate(c);
-                    if (o != null) {
-                        buf.append(o);
+    public void addChars(char[] ch, int start, int length)
+            throws SAXException {
+        int end = start + length;
+        for (int i = start; i < end; ++i) {
+            char c = ch[i];
+            if (Character.isWhitespace(c)) {
+                wasBlank = true;
+            } else {
+                if (wasBlank) {
+                    if (!skipBlank) {
+                        buf.append(' ');
                     }
+                    wasBlank = false;
                 }
+                buf.append(c);
+                skipBlank = false;
             }
-            return buf.toString();
-        };
+        }
     }
 }

@@ -21,12 +21,10 @@ public class MessageFileLoader extends DefaultHandler {
             = "-//tastefuljava.org//Message File 1.0//EN";
     private static final String[] EMPTY_LIST = {};
 
-    private final StringBuilder buf = new StringBuilder();
-    private boolean wasBlank;
-    private boolean skipBlank;
+    private final TextBuilder buf = new TextBuilder();
     private final Messages messages = new Messages();
     private Message message;
-    private TextBuilder text;
+    private SequenceBuilder text;
     private ListBuilder list;
     private SelectBuilder select;
     private String textLanguage;
@@ -110,9 +108,7 @@ public class MessageFileLoader extends DefaultHandler {
             }
  
             case "description":
-                buf.setLength(0);
-                wasBlank = false;
-                skipBlank = true;
+                buf.start(true);
                 break;
 
             case "text": {
@@ -250,13 +246,12 @@ public class MessageFileLoader extends DefaultHandler {
     }
 
     private void startText() {
-        text = new TextBuilder(text);
-        buf.setLength(0);
-        wasBlank = false;
-        skipBlank = true;
+        text = new SequenceBuilder(text);
+        buf.start(true);
     }
 
     private Expression endText() {
+        String s = buf.end(true);
         if (buf.length() > 0) {
             text.addText(buf.toString());
             buf.setLength(0);
@@ -268,42 +263,20 @@ public class MessageFileLoader extends DefaultHandler {
     }
 
     private void startInTextElement() {
-        if (wasBlank && !skipBlank) {
-            buf.append(' ');
+        String s = buf.end(false);
+        if (!s.isEmpty()) {
+            text.addText(s);
         }
-        if (buf.length() > 0) {
-            text.addText(buf.toString());
-            buf.setLength(0);
-        }
-        wasBlank = false;
-        skipBlank = false;
     }
 
     private void endInTextElement() {
-        buf.setLength(0);
-        wasBlank = false;
-        skipBlank = false;
+        buf.start(false);
     }
 
     @Override
     public void characters(char[] ch, int start, int length)
             throws SAXException {
-        int end = start + length;
-        for (int i = start; i < end; ++i) {
-            char c = ch[i];
-            if (Character.isWhitespace(c)) {
-                wasBlank = true;
-            } else {
-                if (wasBlank) {
-                    if (!skipBlank) {
-                        buf.append(' ');
-                    }
-                    wasBlank = false;
-                }
-                buf.append(c);
-                skipBlank = false;
-            }
-        }
+        buf.addChars(ch, start, length);
     }
 
     private static String attr(Attributes attrs, String name, String def) {
