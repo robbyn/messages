@@ -18,7 +18,7 @@ public class Reflection {
     public static Field[] fieldList(Class<?> clazz, String... names) {
         Field[] fields = new Field[names.length];
         for (int i = 0; i < fields.length; ++i) {
-            fields[i] = Reflection.getInstanceField(clazz, names[i]);
+            fields[i] = getInstanceField(clazz, names[i]);
             if (fields[i] == null) {
                 throw new IllegalArgumentException("Field " + names[i]
                         + " not found in class " + clazz.getName());
