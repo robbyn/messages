@@ -4,7 +4,7 @@ public enum UnknownType implements Type {
     INSTANCE;
 
     @Override
-    public boolean matches(Type other) {
+    public boolean isAssignableFrom(Type other) {
         return true;
     }
 }

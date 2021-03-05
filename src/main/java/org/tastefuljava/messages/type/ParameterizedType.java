@@ -43,7 +43,7 @@ public class ParameterizedType implements Type {
     }
 
     @Override
-    public boolean matches(Type type) {
+    public boolean isAssignableFrom(Type type) {
         if (this == type) {
             return true;
         }
@@ -54,14 +54,14 @@ public class ParameterizedType implements Type {
             return false;
         }
         final ParameterizedType other = (ParameterizedType) type;
-        if (!Objects.equals(this.baseClass, other.baseClass)) {
+        if (!this.baseClass.isAssignableFrom(other.baseClass)) {
             return false;
         }
         if (actualArgs.length != other.actualArgs.length) {
             return false;
         }
         for (int i = 0; i < actualArgs.length; ++i) {
-            if (!actualArgs[i].matches(other.actualArgs[i])) {
+            if (!actualArgs[i].isAssignableFrom(other.actualArgs[i])) {
                 return false;
             }
         }
