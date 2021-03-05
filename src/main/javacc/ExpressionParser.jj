@@ -16,12 +16,24 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.ArrayList;
+import org.tastefuljava.messages.type.Type;
+import org.tastefuljava.messages.type.PrimitiveType;
+import org.tastefuljava.messages.type.ClassType;
 
 public class ExpressionParser extends AbstractParser {
     @Override
-    public Expression parse() throws IOException {
+    public Expression parseExpression() throws IOException {
         try {
             return expression();
+        } catch (ParseException e) {
+            throw new IOException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Type parseType() throws IOException {
+        try {
+            return type();
         } catch (ParseException e) {
             throw new IOException(e.getMessage());
         }
@@ -50,8 +62,8 @@ TOKEN : {
     | < RPAR: ")" >
     | < LINDEX: "[" >
     | < RINDEX: "]" >
-    | < INT: (["0"-"9"])+ >
-    | < FLOAT: <INT> "." (["0"-"9"])* | "." (["0"-"9"])+ >
+    | < INTVAL: (["0"-"9"])+ >
+    | < FLOATVAL: <INTVAL> "." (["0"-"9"])* | "." (["0"-"9"])+ >
     | < STRING:
         "\""
         (
@@ -61,9 +73,23 @@ TOKEN : {
         )*
         "\""
     >
-    | < ID: ["A"-"Z","a"-"z","_"] (["0"-"9","A"-"Z","a"-"z","_"])* >
     | < DOT: "." >
     | < COMMA: "," >
+
+    | < BOOL: "boolean" >
+    | < CHAR: "char" >
+    | < BYTE: "byte" >
+    | < SHORT: "short" >
+    | < INT: "int" >
+    | < LONG: "long" >
+    | < FLOAT: "float" >
+    | < DOUBLE: "double" >
+
+    | < LIST: "List" >
+    | < SET: "Set" >
+    | < SORTED: "SortedSet" >
+    | < Map: "Map" >
+    | < ID: ["A"-"Z","a"-"z","_"] (["0"-"9","A"-"Z","a"-"z","_"])* >
 }
 
 Expression expression(): {
@@ -112,8 +138,8 @@ Expression factor(): {
     Expression e;
     String s;
 } {
-    (    s=<INT>.image {e = intNumber(Integer.parseInt(s));}
-    |   s=<FLOAT>.image {e = floatNumber(Double.parseDouble(s));}
+    (   s=<INTVAL>.image {e = intNumber(Integer.parseInt(s));}
+    |   s=<FLOATVAL>.image {e = floatNumber(Double.parseDouble(s));}
     |   s=<STRING>.image {e = string(s);}
     |   <LPAR> e=expression() <RPAR>
     |   s=<ID>.image {e = lookup(s);} (e=qualifier(e))*
@@ -148,4 +174,30 @@ Expression[] params(): {
     )?
     <RPAR>
     {return parms.toArray(new Expression[parms.size()]);}
+}
+
+Type type(): {
+    Type t,k,e;
+} {
+    (
+        <BOOL> {t=PrimitiveType.BOOLEAN;}
+        | <CHAR> {t=PrimitiveType.CHAR;}
+        | <BYTE> {t=PrimitiveType.BYTE;}
+        | <SHORT> {t=PrimitiveType.SHORT;}
+        | <INT> {t=PrimitiveType.INT;}
+        | <LONG> {t=PrimitiveType.LONG;}
+        | <FLOAT> {t=PrimitiveType.FLOAT;}
+        | <DOUBLE> {t=PrimitiveType.DOUBLE;}
+        | t=className()
+    )
+    {return t;}
+}
+
+Type className(): {
+    Type t;
+    String s;
+    StringBuilder buf = new StringBuilder();
+} {
+    s=<ID>.image {buf.append(s);} (<DOT> s=<ID>.image {buf.append('.'); buf.append(s);})*
+    {return ClassType.fromName(buf.toString());}
 }

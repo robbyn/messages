@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.tastefuljava.messages.type.Type;
 import java.util.List;
 import java.util.Map;
 import org.tastefuljava.messages.util.Converter;
@@ -14,7 +15,8 @@ public abstract class AbstractParser {
 
     protected CompilationContext context;
 
-    public abstract Expression parse() throws IOException;
+    public abstract Expression parseExpression() throws IOException;
+    public abstract Type parseType() throws IOException;
 
     public CompilationContext getContext() {
         return context;

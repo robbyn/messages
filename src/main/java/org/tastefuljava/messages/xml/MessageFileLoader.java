@@ -7,7 +7,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.tastefuljava.messages.expr.CompilationContext;
 import org.tastefuljava.messages.expr.Expression;
-import org.tastefuljava.messages.expr.ExpressionCompiler;
+import org.tastefuljava.messages.expr.Compiler;
 import org.tastefuljava.messages.expr.StandardContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -32,7 +32,7 @@ public class MessageFileLoader extends DefaultHandler {
     private String textLanguage;
     private String definitionName;
 
-    private final ExpressionCompiler comp = new ExpressionCompiler();
+    private final Compiler comp = new Compiler();
     private CompilationContext context = new CompilationContext(
             new StandardContext());
     {

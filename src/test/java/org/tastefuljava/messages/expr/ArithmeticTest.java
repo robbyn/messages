@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 public class ArithmeticTest {
     private CompilationContext cxt;
     private EvaluationContext eval;
-    private ExpressionCompiler comp;
+    private Compiler comp;
 
     @BeforeEach
     public void setUp() {
         cxt = new StandardContext();
-        comp = new ExpressionCompiler();
+        comp = new Compiler();
         eval = new EvaluationContext(0);
         TestData test = new TestData();
         test.setByteVal((byte)-4);
