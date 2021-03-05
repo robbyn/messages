@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import org.tastefuljava.messages.type.Type;
 import org.tastefuljava.messages.type.PrimitiveType;
 import org.tastefuljava.messages.type.ClassType;
+import org.tastefuljava.messages.type.ArrayType;
 
 public class ExpressionParser extends AbstractParser {
     @Override
@@ -190,6 +191,7 @@ Type type(): {
         | <DOUBLE> {t=PrimitiveType.DOUBLE;}
         | t=className()
     )
+    ( <LINDEX> <RINDEX> {t=new ArrayType(t);} )*
     {return t;}
 }
 

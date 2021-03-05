@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.tastefuljava.messages.type.ArrayType;
 import org.tastefuljava.messages.type.ClassType;
 import org.tastefuljava.messages.type.PrimitiveType;
 
@@ -45,5 +46,11 @@ public class TypeTest {
                 comp.parseType("Float"));
         assertNotSame(new ClassType(Float.class),
                 comp.parseType("Float"));
+    }
+
+    @Test
+    public void testArrays() throws IOException {
+        assertEquals(new ArrayType(new ArrayType(PrimitiveType.INT)),
+                comp.parseType("int[][]"));
     }
 }
