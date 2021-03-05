@@ -20,6 +20,8 @@ import org.tastefuljava.messages.type.Type;
 import org.tastefuljava.messages.type.PrimitiveType;
 import org.tastefuljava.messages.type.ClassType;
 import org.tastefuljava.messages.type.ArrayType;
+import org.tastefuljava.messages.type.ParameterizedType;
+import org.tastefuljava.messages.type.UnknownType;
 
 public class ExpressionParser extends AbstractParser {
     @Override
@@ -76,6 +78,7 @@ TOKEN : {
     >
     | < DOT: "." >
     | < COMMA: "," >
+    | < INTER: "?" >
 
     | < BOOL: "boolean" >
     | < CHAR: "char" >
@@ -86,10 +89,6 @@ TOKEN : {
     | < FLOAT: "float" >
     | < DOUBLE: "double" >
 
-    | < LIST: "List" >
-    | < SET: "Set" >
-    | < SORTED: "SortedSet" >
-    | < Map: "Map" >
     | < ID: ["A"-"Z","a"-"z","_"] (["0"-"9","A"-"Z","a"-"z","_"])* >
 }
 
@@ -189,17 +188,35 @@ Type type(): {
         | <LONG> {t=PrimitiveType.LONG;}
         | <FLOAT> {t=PrimitiveType.FLOAT;}
         | <DOUBLE> {t=PrimitiveType.DOUBLE;}
-        | t=className()
+        | t=classType()
     )
     ( <LINDEX> <RINDEX> {t=new ArrayType(t);} )*
     {return t;}
 }
 
-Type className(): {
+Type classType(): {
+    ClassType c;
     Type t;
     String s;
     StringBuilder buf = new StringBuilder();
 } {
     s=<ID>.image {buf.append(s);} (<DOT> s=<ID>.image {buf.append('.'); buf.append(s);})*
-    {return ClassType.fromName(buf.toString());}
+    {c=ClassType.fromName(buf.toString());}
+    (t=paramType(c)|{t=c;})
+    {return t;}
+}
+
+ParameterizedType paramType(ClassType c): {
+    List<Type> args = new ArrayList<Type>();
+    Type a;
+} {
+    <LT> a=actualType() {args.add(a);} (<COMMA> a=actualType() {args.add(a);})* <GT>
+    {return new ParameterizedType(c,args.toArray(new Type[args.size()]));}
+}
+
+Type actualType(): {
+    Type t;
+} {
+    (<INTER> {t=UnknownType.INSTANCE;} | t=type())
+    {return t;}
 }
