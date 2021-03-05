@@ -1,6 +1,9 @@
 package org.tastefuljava.messages.expr;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import static junit.framework.Assert.assertFalse;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,6 +72,8 @@ public class TypeTest {
     @Test
     public void testMatches() throws IOException {
         assertMatches("Map<?,?>", "Map<String,List<String>>");
+        // wrong:
+        assertMatches("Map<?,List<?>>", "Map<String,List<String>>");
         assertNotMatches("Map<?,List<Integer>>", "Map<String,List<String>>");
     }
 
