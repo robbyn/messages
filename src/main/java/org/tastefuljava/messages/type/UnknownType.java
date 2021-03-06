@@ -7,4 +7,9 @@ public enum UnknownType implements Type {
     public boolean isAssignableFrom(Type other) {
         return true;
     }
+
+    @Override
+    public boolean isSameThan(Type other) {
+        return true;
+    }
 }

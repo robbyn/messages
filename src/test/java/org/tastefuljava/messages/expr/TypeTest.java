@@ -17,6 +17,7 @@ import org.tastefuljava.messages.type.ClassType;
 import static org.tastefuljava.messages.type.ParameterizedType.collection;
 import static org.tastefuljava.messages.type.ParameterizedType.list;
 import org.tastefuljava.messages.type.PrimitiveType;
+import org.tastefuljava.messages.type.Type;
 
 public class TypeTest {
     private Compiler comp;
@@ -72,16 +73,19 @@ public class TypeTest {
     @Test
     public void testMatches() throws IOException {
         assertMatches("Map<?,?>", "Map<String,List<String>>");
-        // wrong:
-        assertMatches("Map<?,List<?>>", "Map<String,List<String>>");
+        assertNotMatches("Map<?,List<?>>", "Map<String,List<String>>");
         assertNotMatches("Map<?,List<Integer>>", "Map<String,List<String>>");
     }
 
     private void assertMatches(String a, String b) throws IOException {
-        assertTrue(comp.parseType(a).matches(comp.parseType(b)));
+        Type ta = comp.parseType(a);
+        Type tb = comp.parseType(b);
+        assertTrue(ta.isAssignableFrom(tb));
     }
 
     private void assertNotMatches(String a, String b) throws IOException {
-        assertFalse(comp.parseType(a).matches(comp.parseType(b)));
+        Type ta = comp.parseType(a);
+        Type tb = comp.parseType(b);
+        assertFalse(ta.isAssignableFrom(tb));
     }
 }
