@@ -42,6 +42,14 @@ public class ExpressionParser extends AbstractParser {
             throw new IOException(e.getMessage());
         }
     }
+
+    public List<String> parseParams(GenericContext gc) throws IOException {
+        try {
+            return parameters(gc);
+        } catch (ParseException e) {
+            throw new IOException(e.getMessage());
+        }
+    }
 }
 PARSER_END(ExpressionParser)
 
@@ -225,4 +233,23 @@ Type actualType(GenericContext gc): {
 } {
     (<INTER> {t=gc.makeVariable();} | t=type(gc))
     {return t;}
+}
+
+List<String> parameters(GenericContext gc): {
+    String s;
+    List<String> result = new ArrayList<String>();
+} {
+    (
+        s=parameter(gc) {result.add(s);}
+        ( <COMMA> s=parameter(gc) {result.add(s);} )*
+    )?
+    {return result;}
+}
+
+String parameter(GenericContext gc): {
+    Type t;
+    String s;
+} {
+    t=type(gc) s=<ID>.image
+    {return s;}
 }

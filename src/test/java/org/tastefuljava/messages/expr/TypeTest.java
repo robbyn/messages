@@ -23,7 +23,7 @@ public class TypeTest {
 
     @BeforeEach
     public void setUp() {
-        gc = new GenericContext();
+        gc = new GenericContext(null);
         comp = new Compiler();
     }
 

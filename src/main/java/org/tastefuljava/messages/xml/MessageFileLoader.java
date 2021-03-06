@@ -9,6 +9,7 @@ import org.tastefuljava.messages.expr.CompilationContext;
 import org.tastefuljava.messages.expr.Expression;
 import org.tastefuljava.messages.expr.Compiler;
 import org.tastefuljava.messages.expr.StandardContext;
+import org.tastefuljava.messages.type.GenericContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -21,8 +22,10 @@ public class MessageFileLoader extends DefaultHandler {
             = "-//tastefuljava.org//Message File 1.0//EN";
     private static final String[] EMPTY_LIST = {};
 
-    private final TextBuilder text = new TextBuilder();
     private final Messages messages = new Messages();
+    private TextBuilder text;
+    private SimpleTextBuilder stext;
+    private TextHandler textHandler;
     private String prefix;
     private Message message;
     private SequenceBuilder sequence;
@@ -30,6 +33,7 @@ public class MessageFileLoader extends DefaultHandler {
     private ChooseBuilder choose;
     private String textLanguage;
     private String definitionName;
+    private GenericContext gc;
 
     private final Compiler comp = new Compiler();
     private CompilationContext context = new CompilationContext(
@@ -84,6 +88,7 @@ public class MessageFileLoader extends DefaultHandler {
                 prefix = attr(attrs, "prefix", "");
                 messages.setLanguage(
                         attr(attrs, "language", "en"));
+                gc = new GenericContext(gc);
                 break;
 
             case "definition": {
@@ -99,9 +104,10 @@ public class MessageFileLoader extends DefaultHandler {
             }
 
             case "message":
+                gc = new GenericContext(gc);
                 message = new Message(
                         prefix + attr(attrs, "name", ""),
-                        list(attrs, "parameters"));
+                        compileParams(attr(attrs, "parameters", "")));
                 context = new CompilationContext(context);
                 for (String parm: message.getParameters()) {
                     context.addVariable(parm);
@@ -110,7 +116,7 @@ public class MessageFileLoader extends DefaultHandler {
                 break;
 
             case "description":
-                text.start(true);
+                startText(true);
                 break;
 
             case "out": {
@@ -165,10 +171,11 @@ public class MessageFileLoader extends DefaultHandler {
             throws SAXException {
         switch (qName) {
             case "messages":
+                gc = gc.getLink();
                 break;
 
             case "description": {
-                String s = text.end(true);
+                String s = endText(true);
                 if (!s.isEmpty()) {
                     messages.setDescription(s);
                 }
@@ -179,6 +186,7 @@ public class MessageFileLoader extends DefaultHandler {
                 break;
 
             case "message": {
+                gc = gc.getLink();
                 context = context.getLink();
                 Expression expr = endSequence();
                 message.setText(expr);
@@ -229,6 +237,14 @@ public class MessageFileLoader extends DefaultHandler {
         }
     }
 
+    @Override
+    public void characters(char[] ch, int start, int length)
+            throws SAXException {
+        if (textHandler != null) {
+            textHandler.addChars(ch, start, length);
+        }
+    }
+
     private Expression compileExpr(String value) throws SAXException {
         try {
             return comp.compile(context, value);
@@ -237,13 +253,21 @@ public class MessageFileLoader extends DefaultHandler {
         }
     }
 
+    private String[] compileParams(String value) throws SAXException {
+        try {
+            return comp.parseParams(gc, value);
+        } catch (IOException ex) {
+            throw new SAXException(ex.getMessage());
+        }
+    }
+
     private void startSequence() {
         sequence = new SequenceBuilder(sequence);
-        text.start(true);
+        startText(true);
     }
 
     private Expression endSequence() {
-        String s = text.end(true);
+        String s = endText(true);
         if (!s.isEmpty()) {
             sequence.addText(s);
         }
@@ -253,20 +277,34 @@ public class MessageFileLoader extends DefaultHandler {
     }
 
     private void startInSequenceElement() {
-        String s = text.end(false);
+        String s = endText(false);
         if (!s.isEmpty()) {
             sequence.addText(s);
         }
     }
 
     private void endInSequenceElement() {
-        text.start(false);
+        startText(false);
     }
 
-    @Override
-    public void characters(char[] ch, int start, int length)
-            throws SAXException {
-        text.addChars(ch, start, length);
+    private void startText(boolean trimHead) {
+        textHandler = text = new TextBuilder(trimHead);
+    }
+
+    private String endText(boolean trimTail) {
+        String s = text.end(trimTail);
+        textHandler = text = null;
+        return s;
+    }
+
+    private void startText() {
+        textHandler = stext = new SimpleTextBuilder();
+    }
+
+    private String endText() {
+        String s = stext.end();
+        textHandler = stext = null;
+        return s;
     }
 
     private static String attr(Attributes attrs, String name, String def) {

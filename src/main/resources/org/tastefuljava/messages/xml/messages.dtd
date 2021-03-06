@@ -16,6 +16,7 @@
 <!ELEMENT message (#PCDATA|out|if|choose|list)*>
 <!ATTLIST message
     name CDATA #REQUIRED
+    generics CDATA #IMPLIED
     parameters CDATA #IMPLIED
 >
 

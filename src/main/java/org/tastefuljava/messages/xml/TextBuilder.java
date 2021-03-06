@@ -1,18 +1,13 @@
 package org.tastefuljava.messages.xml;
 
-import org.xml.sax.SAXException;
-
-public class TextBuilder {
+public class TextBuilder implements TextHandler {
     private final StringBuilder buf = new StringBuilder();
     private boolean wasBlank;
-    private boolean skipBlank = true;
+    private boolean skipBlank;
     private int eolCount;
 
-    public void start(boolean trimHead) {
-        buf.setLength(0);
-        wasBlank = false;
-        skipBlank = trimHead;
-        eolCount = 0;
+    public TextBuilder(boolean trimHead) {
+        this.skipBlank = trimHead;
     }
 
     public String end(boolean trimTail) {
@@ -22,8 +17,8 @@ public class TextBuilder {
         return buf.toString();
     }
 
-    public void addChars(char[] ch, int start, int length)
-            throws SAXException {
+    @Override
+    public void addChars(char[] ch, int start, int length) {
         int end = start + length;
         for (int i = start; i < end; ++i) {
             char c = ch[i];

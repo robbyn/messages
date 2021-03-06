@@ -2,10 +2,10 @@
 <!DOCTYPE messages
     PUBLIC '-//tastefuljava.org//Message File 1.0//EN' 'messages.dtd'>
 <messages language="en">
-    <message name="appNotFound" parameters="app">
+    <message name="appNotFound" parameters="String app">
         Unknown application: <out value="app"/>.
     </message>
-    <message name="choose" parameters="a,b">
+    <message name="choose" parameters="String a, String b">
         (<choose>
             <when condition="a==0">
                 zero
@@ -44,26 +44,26 @@
             </otherwise>
         </choose>)
     </message>
-    <message name="list" parameters="list">
+    <message name="list" parameters="List list">
         (<list value="list" variable="elem">
             <out value="elem"/>
         </list>)
     </message>
-    <message name="list2" parameters="list">
+    <message name="list2" parameters="List list">
         (<list value="list" variable="elem">
             <out value="text.enquote(elem)"/>
         </list>)
     </message>
-    <message name="list3" parameters="list">
+    <message name="list3" parameters="List list">
         (<out value='text.join(list,", ")'/>)
     </message>
-    <message name="list4" parameters="list">
+    <message name="list4" parameters="List list">
         (<out value='text.joinEnquote(list,", ")'/>)
     </message>
-    <message name="index" parameters="a,i">
+    <message name="index" parameters="List a,int i">
         <out value="a[i]"/>
     </message>
-    <message name="text" parameters="line1,line2,line3">
+    <message name="text" parameters="String line1,String line2,String line3">
         ----    Begin text    ----
 
         <out value="line1"/>

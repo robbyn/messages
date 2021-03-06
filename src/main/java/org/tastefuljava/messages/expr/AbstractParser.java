@@ -18,6 +18,8 @@ public abstract class AbstractParser {
 
     public abstract Expression parseExpression() throws IOException;
     public abstract Type parseType(GenericContext gc) throws IOException;
+    public abstract List<String> parseParams(GenericContext gc)
+            throws IOException;
 
     public CompilationContext getContext() {
         return context;
