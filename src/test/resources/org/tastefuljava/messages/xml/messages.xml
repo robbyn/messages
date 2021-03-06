@@ -2,18 +2,23 @@
 <!DOCTYPE messages
     PUBLIC '-//tastefuljava.org//Message File 1.0//EN' 'messages.dtd'>
 <messages language="en">
-    <message name="appNotFound" parameters="String app">
-        Unknown application: <out value="app"/>.
+    <message name="appNotFound" >
+        <parameters><![CDATA[ String app ]]></parameters>
+        <text>
+            Unknown application: <out value="app"/>.
+        </text>
     </message>
-    <message name="choose" parameters="String a, String b">
-        (<choose>
-            <when condition="a==0">
-                zero
-                <choose>
-                    <when condition="b==0">
-                        zero
-                    </when>
-                    <when condition="b==1">
+    <message name="choose" >
+        <parameters><![CDATA[ String a, String b ]]></parameters>
+        <text>
+            (<choose>
+                <when condition="a==0">
+                    zero
+                    <choose>
+                        <when condition="b==0">
+                            zero
+                        </when>
+                        <when condition="b==1">
                         one
                     </when>
                     <when condition="b==2">
@@ -43,35 +48,54 @@
                 </if>
             </otherwise>
         </choose>)
+        </text>
     </message>
-    <message name="list" parameters="List list">
-        (<list value="list" variable="elem">
-            <out value="elem"/>
-        </list>)
+    <message name="list" >
+        <parameters><![CDATA[ List<?> list ]]></parameters>
+        <text>
+            (<list value="list" variable="elem">
+                <out value="elem"/>
+            </list>)
+        </text>
     </message>
-    <message name="list2" parameters="List list">
-        (<list value="list" variable="elem">
-            <out value="text.enquote(elem)"/>
-        </list>)
+    <message name="list2" >
+        <parameters><![CDATA[ List<?> list ]]></parameters>
+        <text>
+            (<list value="list" variable="elem">
+                <out value="text.enquote(elem)"/>
+            </list>)
+        </text>
     </message>
-    <message name="list3" parameters="List list">
-        (<out value='text.join(list,", ")'/>)
+    <message name="list3" >
+        <parameters><![CDATA[ List<?> list ]]></parameters>
+        <text>
+            (<out value='text.join(list,", ")'/>)
+        </text>
     </message>
-    <message name="list4" parameters="List list">
-        (<out value='text.joinEnquote(list,", ")'/>)
+    <message name="list4" >
+        <parameters><![CDATA[ List<?> list ]]></parameters>
+        <text>
+            (<out value='text.joinEnquote(list,", ")'/>)
+        </text>
     </message>
-    <message name="index" parameters="List a,int i">
-        <out value="a[i]"/>
+    <message name="index" >
+        <parameters><![CDATA[ List<?> a,int i ]]></parameters>
+        <text>
+            <out value="a[i]"/>
+        </text>
     </message>
-    <message name="text" parameters="String line1,String line2,String line3">
-        ----    Begin text    ----
+    <message name="text" >
+        <parameters><![CDATA[ String line1,String line2,String line3 ]]></parameters>
+        <text>
+            ----    Begin text    ----
 
-        <out value="line1"/>
+            <out value="line1"/>
 
-        <out value="line2"/>
+            <out value="line2"/>
 
-        <out value="line3"/>
+            <out value="line3"/>
 
-        ----    End text    ----
+            ----    End text    ----
+        </text>
     </message>
 </messages>
