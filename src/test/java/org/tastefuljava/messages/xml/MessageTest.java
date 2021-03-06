@@ -26,6 +26,7 @@ public class MessageTest {
         assertEquals("en", messages.getLanguage());
         assertEquals("Unknown application: MyApp.",
                 messages.format("appNotFound", "MyApp"));
+        assertEquals("no parameter", messages.format("nopar"));
     }
 
     @Test

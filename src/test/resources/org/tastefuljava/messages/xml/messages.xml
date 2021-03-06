@@ -74,4 +74,7 @@
 
         ----    End text    ----
     </message>
+    <message name="nopar">
+        no parameter
+    </message>
 </messages>
