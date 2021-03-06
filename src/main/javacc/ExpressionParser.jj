@@ -43,7 +43,7 @@ public class ExpressionParser extends AbstractParser {
         }
     }
 
-    public List<String> parseParams(GenericContext gc) throws IOException {
+    public int parseParams(GenericContext gc) throws IOException {
         try {
             return parameters(gc);
         } catch (ParseException e) {
@@ -235,15 +235,15 @@ Type actualType(GenericContext gc): {
     {return t;}
 }
 
-List<String> parameters(GenericContext gc): {
+int parameters(GenericContext gc): {
     String s;
-    List<String> result = new ArrayList<String>();
+    int count = 0;
 } {
     (
-        s=parameter(gc) {result.add(s);}
-        ( <COMMA> s=parameter(gc) {result.add(s);} )*
+        s=parameter(gc) {++count;}
+        ( <COMMA> s=parameter(gc) {++count;} )*
     )?
-    {return result;}
+    {return count;}
 }
 
 String parameter(GenericContext gc): {

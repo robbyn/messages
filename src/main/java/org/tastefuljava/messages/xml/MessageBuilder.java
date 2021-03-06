@@ -6,22 +6,15 @@ import org.tastefuljava.messages.expr.Expression;
 
 public class MessageBuilder {
     private final String name;
-    private final List<String> parameters = new ArrayList<>();
+    private int paramCount;
     private Expression text;
 
     public MessageBuilder(String name) {
         this.name = name;
     }
 
-    public MessageBuilder addParam(String name) {
-        parameters.add(name);
-        return this;
-    }
-
-    public MessageBuilder addParams(String... names) {
-        for (String name: names) {
-            parameters.add(name);
-        }
+    public MessageBuilder setParamCount(int paramCount) {
+        this.paramCount = paramCount;
         return this;
     }
 
@@ -31,7 +24,6 @@ public class MessageBuilder {
     }
 
     public Message build() {
-        String[] parms = parameters.toArray(new String[parameters.size()]);
-        return new Message(name, parms, text);
+        return new Message(name, paramCount, text);
     }
 }

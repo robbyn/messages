@@ -4,7 +4,6 @@ import org.tastefuljava.messages.expr.impl.ExpressionParser;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.List;
 import org.tastefuljava.messages.type.GenericContext;
 import org.tastefuljava.messages.type.Type;
 
@@ -25,14 +24,13 @@ public class Compiler {
         }
     }
 
-    public String[] parseParams(
+    public int parseParams(
             CompilationContext cxt, GenericContext gc, String s)
             throws IOException {
         try (Reader reader = new StringReader(s)) {
             AbstractParser parser = new ExpressionParser(reader);
             parser.setContext(cxt);
-            List<String> list = parser.parseParams(gc);
-            return list.toArray(new String[list.size()]);
+            return parser.parseParams(gc);
         }
     }
 }

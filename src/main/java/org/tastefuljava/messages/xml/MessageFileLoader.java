@@ -108,8 +108,8 @@ public class MessageFileLoader extends DefaultHandler {
                 context = new CompilationContext(context);
                 message = new MessageBuilder(
                         prefix + attr(attrs, "name", ""));
-                String[] parms = compileParams(attr(attrs, "parameters", ""));
-                message.addParams(parms);
+                int paramCount = compileParams(attr(attrs, "parameters", ""));
+                message.setParamCount(paramCount);
                 startSequence();
                 break;
             }
@@ -253,7 +253,7 @@ public class MessageFileLoader extends DefaultHandler {
         }
     }
 
-    private String[] compileParams(String value) throws SAXException {
+    private int compileParams(String value) throws SAXException {
         try {
             return comp.parseParams(context, gc, value);
         } catch (IOException ex) {

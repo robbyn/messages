@@ -5,12 +5,12 @@ import org.tastefuljava.messages.expr.Expression;
 
 public class Message {
     private final String name;
-    private final String[] parameters;
+    private final int paramCount;
     private final Expression text;
 
-    public Message(String name, String[] parameters, Expression text) {
+    public Message(String name, int paramCount, Expression text) {
         this.name = name;
-        this.parameters = parameters;
+        this.paramCount = paramCount;
         this.text = text;
     }
 
@@ -18,15 +18,10 @@ public class Message {
         return name;
     }
 
-    public String[] getParameters() {
-        return parameters.clone();
-    }
-
     public String format(Object... parms) {
-        int expPar = parameters.length;
-        if (expPar != parms.length) {
+        if (parms.length != paramCount) {
             throw new IllegalArgumentException(
-                    "Mauvais nombre de paramètres: attendu " + expPar
+                    "Mauvais nombre de paramètres: attendu " + paramCount
                             + " reçu: " + parms.length);
         }
         EvaluationContext cxt = new EvaluationContext(2);
