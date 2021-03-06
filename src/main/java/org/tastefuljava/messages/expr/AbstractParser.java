@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import org.tastefuljava.messages.type.Type;
 import java.util.List;
 import java.util.Map;
+import org.tastefuljava.messages.type.GenericContext;
 import org.tastefuljava.messages.util.Converter;
 import org.tastefuljava.messages.util.Reflection;
 
@@ -16,7 +17,7 @@ public abstract class AbstractParser {
     protected CompilationContext context;
 
     public abstract Expression parseExpression() throws IOException;
-    public abstract Type parseType() throws IOException;
+    public abstract Type parseType(GenericContext gc) throws IOException;
 
     public CompilationContext getContext() {
         return context;

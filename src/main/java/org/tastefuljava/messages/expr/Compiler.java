@@ -4,6 +4,7 @@ import org.tastefuljava.messages.expr.impl.ExpressionParser;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import org.tastefuljava.messages.type.GenericContext;
 import org.tastefuljava.messages.type.Type;
 
 public class Compiler {
@@ -16,10 +17,10 @@ public class Compiler {
         }
     }
 
-    public Type parseType(String s) throws IOException {
+    public Type parseType(GenericContext gc, String s) throws IOException {
         try (Reader reader = new StringReader(s)) {
             AbstractParser parser = new ExpressionParser(reader);
-            return parser.parseType();
+            return parser.parseType(gc);
         }
     }
 }
