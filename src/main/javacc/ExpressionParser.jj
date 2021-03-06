@@ -251,5 +251,8 @@ String parameter(GenericContext gc): {
     String s;
 } {
     t=type(gc) s=<ID>.image
-    {return s;}
+    {
+        context.addVariable(s);
+        return s;
+    }
 }

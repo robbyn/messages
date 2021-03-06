@@ -105,18 +105,14 @@ public class MessageFileLoader extends DefaultHandler {
 
             case "message": {
                 gc = new GenericContext(gc);
+                context = new CompilationContext(context);
                 message = new MessageBuilder(
                         prefix + attr(attrs, "name", ""));
                 String[] parms = compileParams(attr(attrs, "parameters", ""));
                 message.addParams(parms);
-                context = new CompilationContext(context);
-                for (String parm: parms) {
-                    context.addVariable(parm);
-                }
                 startSequence();
                 break;
             }
-
 
             case "description":
                 startText(true);
@@ -259,7 +255,7 @@ public class MessageFileLoader extends DefaultHandler {
 
     private String[] compileParams(String value) throws SAXException {
         try {
-            return comp.parseParams(gc, value);
+            return comp.parseParams(context, gc, value);
         } catch (IOException ex) {
             throw new SAXException(ex.getMessage());
         }

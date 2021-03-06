@@ -25,9 +25,12 @@ public class Compiler {
         }
     }
 
-    public String[] parseParams(GenericContext gc, String s) throws IOException {
+    public String[] parseParams(
+            CompilationContext cxt, GenericContext gc, String s)
+            throws IOException {
         try (Reader reader = new StringReader(s)) {
             AbstractParser parser = new ExpressionParser(reader);
+            parser.setContext(cxt);
             List<String> list = parser.parseParams(gc);
             return list.toArray(new String[list.size()]);
         }
