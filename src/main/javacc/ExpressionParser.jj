@@ -21,7 +21,8 @@ import org.tastefuljava.messages.type.PrimitiveType;
 import org.tastefuljava.messages.type.ClassType;
 import org.tastefuljava.messages.type.ArrayType;
 import org.tastefuljava.messages.type.ParameterizedType;
-import org.tastefuljava.messages.type.VariableType;
+import org.tastefuljava.messages.type.TypeVariable;
+import org.tastefuljava.messages.type.GenericContext;
 
 public class ExpressionParser extends AbstractParser {
     @Override
@@ -34,9 +35,9 @@ public class ExpressionParser extends AbstractParser {
     }
 
     @Override
-    public Type parseType() throws IOException {
+    public Type parseType(GenericContext gc) throws IOException {
         try {
-            return type();
+            return type(gc);
         } catch (ParseException e) {
             throw new IOException(e.getMessage());
         }
@@ -176,7 +177,8 @@ Expression[] params(): {
     {return parms.toArray(new Expression[parms.size()]);}
 }
 
-Type type(): {
+Type type(GenericContext gc): {
+    String s;
     Type t,k,e;
 } {
     (
@@ -188,35 +190,39 @@ Type type(): {
         | <LONG> {t=PrimitiveType.LONG;}
         | <FLOAT> {t=PrimitiveType.FLOAT;}
         | <DOUBLE> {t=PrimitiveType.DOUBLE;}
-        | t=classType()
+        | t=classType(gc)
     )
     ( <LINDEX> <RINDEX> {t=new ArrayType(t);} )*
     {return t;}
 }
 
-Type classType(): {
+Type classType(GenericContext gc): {
     ClassType c;
     Type t;
     String s;
     StringBuilder buf = new StringBuilder();
 } {
     s=<ID>.image {buf.append(s);} (<DOT> s=<ID>.image {buf.append('.'); buf.append(s);})*
+    {t=gc.get(buf.toString()); if (t != null) return t;}
     {c=ClassType.fromName(buf.toString());}
-    (t=paramType(c)|{t=c;})
+    (t=paramType(gc,c)|{t=c;})
     {return t;}
 }
 
-ParameterizedType paramType(ClassType c): {
+ParameterizedType paramType(GenericContext gc, ClassType c): {
     List<Type> args = new ArrayList<Type>();
     Type a;
 } {
-    <LT> a=actualType() {args.add(a);} (<COMMA> a=actualType() {args.add(a);})* <GT>
+    <LT>
+        a=actualType(gc) {args.add(a);}
+        (<COMMA> a=actualType(gc) {args.add(a);})*
+    <GT>
     {return new ParameterizedType(c,args.toArray(new Type[args.size()]));}
 }
 
-Type actualType(): {
+Type actualType(GenericContext gc): {
     Type t;
 } {
-    (<INTER> {t=new VariableType();} | t=type())
+    (<INTER> {t=gc.makeVariable();} | t=type(gc))
     {return t;}
 }
