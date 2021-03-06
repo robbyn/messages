@@ -21,7 +21,7 @@ import org.tastefuljava.messages.type.PrimitiveType;
 import org.tastefuljava.messages.type.ClassType;
 import org.tastefuljava.messages.type.ArrayType;
 import org.tastefuljava.messages.type.ParameterizedType;
-import org.tastefuljava.messages.type.UnknownType;
+import org.tastefuljava.messages.type.VariableType;
 
 public class ExpressionParser extends AbstractParser {
     @Override
@@ -217,6 +217,6 @@ ParameterizedType paramType(ClassType c): {
 Type actualType(): {
     Type t;
 } {
-    (<INTER> {t=UnknownType.INSTANCE;} | t=type())
+    (<INTER> {t=new VariableType();} | t=type())
     {return t;}
 }
