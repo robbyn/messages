@@ -107,22 +107,16 @@ public class MessageFileLoader extends DefaultHandler {
                 gc = new GenericContext(gc);
                 message = new MessageBuilder(
                         prefix + attr(attrs, "name", ""));
+                String[] parms = compileParams(attr(attrs, "parameters", ""));
+                message.addParams(parms);
                 context = new CompilationContext(context);
+                for (String parm: parms) {
+                    context.addVariable(parm);
+                }
                 startSequence();
                 break;
             }
 
-            case "generics":
-                startText();
-                break;
-
-            case "parameters":
-                startText();
-                break;
-
-            case "text":
-                startSequence();
-                break;
 
             case "description":
                 startText(true);
@@ -197,29 +191,11 @@ public class MessageFileLoader extends DefaultHandler {
             case "message": {
                 gc = gc.getLink();
                 context = context.getLink();
+                Expression expr = endSequence();
+                message.setText(expr);
                 Message msg = message.build();
                 messages.setMessage(msg.getName(), msg);
                 message = null;
-                break;
-            }
-
-            case "generics":
-                endText();
-                break;
-
-            case "parameters": {
-                String s = endText();
-                String[] parms = compileParams(s);
-                message.addParams(parms);
-                for (String parm: parms) {
-                    context.addVariable(parm);
-                }
-                break;
-            }
-
-            case "text": {
-                Expression expr = endSequence();
-                message.setText(expr);
                 break;
             }
 

@@ -13,16 +13,12 @@
     value CDATA #IMPLIED
 >
 
-<!ELEMENT message (generics?,parameters?,text)*>
+<!ELEMENT message (#PCDATA|out|if|choose|list)*>
 <!ATTLIST message
     name CDATA #REQUIRED
+    generics CDATA #IMPLIED
+    parameters CDATA #IMPLIED
 >
-
-<!ELEMENT generics (#PCDATA)>
-
-<!ELEMENT parameters (#PCDATA)>
-
-<!ELEMENT text (#PCDATA|out|if|choose|list)*>
 
 <!ELEMENT if (#PCDATA|out|if|choose|list)*>
 <!ATTLIST if
