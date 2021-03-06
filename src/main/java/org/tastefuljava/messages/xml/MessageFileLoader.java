@@ -27,7 +27,7 @@ public class MessageFileLoader extends DefaultHandler {
     private SimpleTextBuilder stext;
     private TextHandler textHandler;
     private String prefix;
-    private Message message;
+    private MessageBuilder message;
     private SequenceBuilder sequence;
     private ListBuilder list;
     private ChooseBuilder choose;
@@ -103,17 +103,20 @@ public class MessageFileLoader extends DefaultHandler {
                 break;
             }
 
-            case "message":
+            case "message": {
                 gc = new GenericContext(gc);
-                message = new Message(
-                        prefix + attr(attrs, "name", ""),
-                        compileParams(attr(attrs, "parameters", "")));
+                message = new MessageBuilder(
+                        prefix + attr(attrs, "name", ""));
+                String[] parms = compileParams(attr(attrs, "parameters", ""));
+                message.addParams(parms);
                 context = new CompilationContext(context);
-                for (String parm: message.getParameters()) {
+                for (String parm: parms) {
                     context.addVariable(parm);
                 }
                 startSequence();
                 break;
+            }
+
 
             case "description":
                 startText(true);
@@ -190,7 +193,8 @@ public class MessageFileLoader extends DefaultHandler {
                 context = context.getLink();
                 Expression expr = endSequence();
                 message.setText(expr);
-                messages.setMessage(message.getName(), message);
+                Message msg = message.build();
+                messages.setMessage(msg.getName(), msg);
                 message = null;
                 break;
             }

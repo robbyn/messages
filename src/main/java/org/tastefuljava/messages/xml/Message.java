@@ -6,11 +6,12 @@ import org.tastefuljava.messages.expr.Expression;
 public class Message {
     private final String name;
     private final String[] parameters;
-    private Expression text;
+    private final Expression text;
 
-    public Message(String name, String[] parameters) {
+    public Message(String name, String[] parameters, Expression text) {
         this.name = name;
         this.parameters = parameters;
+        this.text = text;
     }
 
     public String getName() {
@@ -19,10 +20,6 @@ public class Message {
 
     public String[] getParameters() {
         return parameters.clone();
-    }
-
-    public void setText(Expression expr) {
-        text = expr;
     }
 
     public String format(Object... parms) {
