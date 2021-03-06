@@ -25,7 +25,6 @@ public class MessageFileLoader extends DefaultHandler {
     private final Messages messages = new Messages();
     private String prefix;
     private Message message;
-    private Described descriptionHolder;
     private SequenceBuilder sequence;
     private ListBuilder list;
     private ChooseBuilder choose;
@@ -85,7 +84,6 @@ public class MessageFileLoader extends DefaultHandler {
                 prefix = attr(attrs, "prefix", "");
                 messages.setLanguage(
                         attr(attrs, "language", "en"));
-                descriptionHolder = messages;
                 break;
 
             case "definition": {
@@ -167,13 +165,12 @@ public class MessageFileLoader extends DefaultHandler {
             throws SAXException {
         switch (qName) {
             case "messages":
-                descriptionHolder = null;
                 break;
 
             case "description": {
                 String s = text.end(true);
                 if (!s.isEmpty()) {
-                    descriptionHolder.setDescription(s);
+                    messages.setDescription(s);
                 }
                 break;
             }
@@ -187,7 +184,6 @@ public class MessageFileLoader extends DefaultHandler {
                 message.setText(expr);
                 messages.setMessage(message.getName(), message);
                 message = null;
-                descriptionHolder = null;
                 break;
             }
 

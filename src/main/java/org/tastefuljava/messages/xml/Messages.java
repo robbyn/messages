@@ -3,9 +3,10 @@ package org.tastefuljava.messages.xml;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Messages extends Described {
+public class Messages {
     private String language;
     private final Map<String,Message> messages = new HashMap<>();
+    protected String description;
 
     public String getLanguage() {
         return language;
@@ -29,5 +30,13 @@ public class Messages extends Described {
             throw new IllegalArgumentException("Message inconnu: " + name);
         }
         return msg.format(parms);
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

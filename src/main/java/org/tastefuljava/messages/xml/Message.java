@@ -1,14 +1,9 @@
 package org.tastefuljava.messages.xml;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import org.tastefuljava.messages.expr.EvaluationContext;
 import org.tastefuljava.messages.expr.Expression;
 
-public class Message extends Described {
+public class Message {
     private final String name;
     private final String[] parameters;
     private Expression text;
