@@ -77,4 +77,8 @@
     <message name="nopar">
         no parameter
     </message>
+    <message name="generics" generics="T" parameters="List&lt;T> a, List&lt;T> b">
+        <out value='text.join(a,", ")'/>
+        <out value='text.join(b,", ")'/>
+    </message>
 </messages>

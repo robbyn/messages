@@ -1,12 +1,16 @@
 package org.tastefuljava.messages.type;
 
 public class TypeVariable implements Type {
-    private int index;
+    private final int index;
     private final Bound[] bounds;
 
     TypeVariable(int index, Bound...bounds) {
         this.index = index;
         this.bounds = bounds;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     @Override

@@ -42,6 +42,14 @@ public class ParameterizedType implements Type {
         this.actualArgs = actualArgs;
     }
 
+    public int getArgCount() {
+        return actualArgs.length;
+    }
+
+    public Type getArg(int ix) {
+        return actualArgs[ix];
+    }
+
     @Override
     public boolean isAssignableFrom(Type type) {
         if (this == type) {

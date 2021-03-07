@@ -43,9 +43,19 @@ public class ExpressionParser extends AbstractParser {
         }
     }
 
-    public int parseParams(GenericContext gc) throws IOException {
+    @Override
+    public List<Type> parseParams(GenericContext gc) throws IOException {
         try {
             return parameters(gc);
+        } catch (ParseException e) {
+            throw new IOException(e.getMessage());
+        }
+    }
+
+    @Override
+    public int parseGenerics(GenericContext gc) throws IOException {
+        try {
+            return generics(gc);
         } catch (ParseException e) {
             throw new IOException(e.getMessage());
         }
@@ -198,7 +208,8 @@ Type type(GenericContext gc): {
         | <LONG> {t=PrimitiveType.LONG;}
         | <FLOAT> {t=PrimitiveType.FLOAT;}
         | <DOUBLE> {t=PrimitiveType.DOUBLE;}
-        | t=classType(gc)
+        | LOOKAHEAD( (<ID> (<DOT>|<LT>)) ) t=classType(gc)
+        | t=varOrClassName(gc)
     )
     ( <LINDEX> <RINDEX> {t=new ArrayType(t);} )*
     {return t;}
@@ -211,10 +222,25 @@ Type classType(GenericContext gc): {
     StringBuilder buf = new StringBuilder();
 } {
     s=<ID>.image {buf.append(s);} (<DOT> s=<ID>.image {buf.append('.'); buf.append(s);})*
-    {t=gc.get(buf.toString()); if (t != null) return t;}
     {c=ClassType.fromName(buf.toString());}
     (t=paramType(gc,c)|{t=c;})
     {return t;}
+}
+
+Type varOrClassName(GenericContext gc): {
+    ClassType c;
+    Type t;
+    String s;
+    StringBuilder buf = new StringBuilder();
+} {
+    s=<ID>.image
+    {
+        t=gc.get(s);
+        if (t == null) {
+            t = ClassType.fromName(s);
+        }
+        return t;
+    }
 }
 
 ParameterizedType paramType(GenericContext gc, ClassType c): {
@@ -235,24 +261,45 @@ Type actualType(GenericContext gc): {
     {return t;}
 }
 
-int parameters(GenericContext gc): {
-    String s;
-    int count = 0;
+List<Type> parameters(GenericContext gc): {
+    Type t;
+    List<Type> result = new ArrayList<Type>();
 } {
     (
-        s=parameter(gc) {++count;}
-        ( <COMMA> s=parameter(gc) {++count;} )*
+        t=parameter(gc) {result.add(t);}
+        ( <COMMA> t=parameter(gc) {result.add(t);} )*
     )?
-    {return count;}
+    {return result;}
 }
 
-String parameter(GenericContext gc): {
+Type parameter(GenericContext gc): {
     Type t;
     String s;
 } {
     t=type(gc) s=<ID>.image
     {
         context.addVariable(s);
-        return s;
+        return t;
+    }
+}
+
+int generics(GenericContext gc): {
+    int count = 0;
+} {
+    (
+        generic(gc) {++count;}
+        (<COMMA> generic(gc) {++count;})*
+    )?
+    {return count;}
+}
+
+TypeVariable generic(GenericContext gc): {
+    String s;
+    TypeVariable v;
+} {
+    s=<ID>.image {
+        v=gc.makeVariable();
+        gc.define(s,v);
+        return v;
     }
 }

@@ -2,6 +2,7 @@ package org.tastefuljava.messages.xml;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,5 +56,12 @@ public class MessageTest {
                 + "Line 1\nLine 2\nLine 3\n"
                 + "---- End text ----",
                 messages.format("text", "Line 1", "Line 2", "Line 3"));
+    }
+
+    @Test
+    public void testGenerics()  {
+        List<String> a = Arrays.asList("a", "b", "c");
+        List<String> b = Arrays.asList("1", "2", "3");
+        assertEquals("a, b, c 1, 2, 3", messages.format("generics", a, b));
     }
 }

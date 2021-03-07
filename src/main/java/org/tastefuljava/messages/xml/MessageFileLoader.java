@@ -2,6 +2,7 @@ package org.tastefuljava.messages.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -10,6 +11,7 @@ import org.tastefuljava.messages.expr.Expression;
 import org.tastefuljava.messages.expr.Compiler;
 import org.tastefuljava.messages.expr.StandardContext;
 import org.tastefuljava.messages.type.GenericContext;
+import org.tastefuljava.messages.type.Type;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -108,8 +110,9 @@ public class MessageFileLoader extends DefaultHandler {
                 context = new CompilationContext(context);
                 message = new MessageBuilder(
                         prefix + attr(attrs, "name", ""));
-                int paramCount = compileParams(attr(attrs, "parameters", ""));
-                message.setParamCount(paramCount);
+                compileGenerics(attr(attrs, "generics", ""));
+                List<Type> params = compileParams(attr(attrs, "parameters", ""));
+                message.setParamCount(params.size());
                 startSequence();
                 break;
             }
@@ -253,9 +256,17 @@ public class MessageFileLoader extends DefaultHandler {
         }
     }
 
-    private int compileParams(String value) throws SAXException {
+    private List<Type> compileParams(String value) throws SAXException {
         try {
             return comp.parseParams(context, gc, value);
+        } catch (IOException ex) {
+            throw new SAXException(ex.getMessage());
+        }
+    }
+
+    private int compileGenerics(String value) throws SAXException {
+        try {
+            return comp.parseGenerics(context, gc, value);
         } catch (IOException ex) {
             throw new SAXException(ex.getMessage());
         }
