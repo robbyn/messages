@@ -70,6 +70,7 @@ SKIP: {
 TOKEN : {
     < OR: "|" ("|")?  >
     | < AND: "&" ("&")? >
+    | < NOT: "!" | "not" >
     | < EQ: "=" ("=")? >
     | < NE: "!=" >
     | < LT: "<" >
@@ -160,8 +161,9 @@ Expression factor(): {
     (   s=<INTVAL>.image {e = intNumber(Integer.parseInt(s));}
     |   s=<FLOATVAL>.image {e = floatNumber(Double.parseDouble(s));}
     |   s=<STRING>.image {e = string(s);}
-    |   <LPAR> e=expression() <RPAR>
     |   s=<ID>.image {e = lookup(s);} (e=qualifier(e))*
+    |   <LPAR> e=expression() <RPAR>
+    |   <NOT> e=factor() {e = not(e);}
     )
     {return e;}
 }

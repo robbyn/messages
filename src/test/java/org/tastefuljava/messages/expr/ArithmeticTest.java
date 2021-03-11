@@ -110,6 +110,26 @@ public class ArithmeticTest {
         assertEquals(1, evaln("a[b]", intMap, "one"));
     }
 
+    @Test
+    public void testBooleans() throws IOException {
+        assertEquals(true, evaln("a", true));
+        assertEquals(false, evaln("a", false));
+        assertEquals(false, evaln("!a", true));
+        assertEquals(true, evaln("!a", false));
+        assertEquals(false, evaln("not a", true));
+        assertEquals(true, evaln("not a", false));
+
+        assertEquals(false, evaln("a && b", false, false));
+        assertEquals(false, evaln("a && b", false, true));
+        assertEquals(true, evaln("a && b", true, true));
+        assertEquals(false, evaln("a && b", true, false));
+
+        assertEquals(false, evaln("a || b", false, false));
+        assertEquals(true, evaln("a || b", false, true));
+        assertEquals(true, evaln("a || b", true, true));
+        assertEquals(true, evaln("a || b", true, false));
+    }
+
     private Object eval(String s) throws IOException {
         Expression e = comp.compile(cxt, s);
         Object v = e.evaluate(eval);
