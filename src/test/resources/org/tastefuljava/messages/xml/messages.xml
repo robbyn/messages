@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE messages
-    PUBLIC '-//OCSIN Geneve//GINA Message File 1.0//EN' 'messages.dtd'>
+    PUBLIC '-//tastefuljava.org//Message File 1.0//EN' 'messages.dtd'>
 <messages language="en">
     <message name="appNotFound" parameters="String app">
         Unknown application: <out value="app"/>.

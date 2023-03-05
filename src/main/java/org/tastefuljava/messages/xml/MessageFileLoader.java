@@ -3,6 +3,8 @@ package org.tastefuljava.messages.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -23,6 +25,8 @@ public class MessageFileLoader extends DefaultHandler {
     private static final String DTD_PUBLIC_ID
             = "-//tastefuljava.org//Message File 1.0//EN";
     private static final String[] EMPTY_LIST = {};
+    private static final Pattern RE_FILENAME
+            = Pattern.compile("^.*[\\\\/:]?([^\\\\/:]*)");
 
     private final Messages messages;
     private TextBuilder text;
@@ -67,10 +71,11 @@ public class MessageFileLoader extends DefaultHandler {
     @Override
     public InputSource resolveEntity(String publicId, String systemId)
             throws IOException, SAXException {
+        String fileName = fileName(systemId);
         if (DTD_PUBLIC_ID.equals(publicId)
-                || DTD_SYSTEM_ID.equals(systemId)) {
+                || DTD_SYSTEM_ID.equals(fileName)) {
             InputSource source = new InputSource(
-                    getClass().getResourceAsStream("messages.dtd"));
+                    getClass().getResourceAsStream(DTD_SYSTEM_ID));
             source.setPublicId(publicId);
             source.setSystemId(systemId);
             return source;
@@ -312,23 +317,16 @@ public class MessageFileLoader extends DefaultHandler {
         return s;
     }
 
-    private void startText() {
-        textHandler = stext = new SimpleTextBuilder();
-    }
-
-    private String endText() {
-        String s = stext.end();
-        textHandler = stext = null;
-        return s;
-    }
-
     private static String attr(Attributes attrs, String name, String def) {
         String s = attrs.getValue(name);
         return s != null ? s : def;
     }
 
-    private static String[] list(Attributes attrs, String name) {
-        String s = attrs.getValue(name);
-        return s != null ? s.split("[,;]") : EMPTY_LIST;
+    private static String fileName(String uri) {
+        Matcher matcher = RE_FILENAME.matcher(uri);
+        if (!matcher.matches()) {
+            return uri;
+        }
+        return matcher.group(1);
     }
 }
