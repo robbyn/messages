@@ -2,7 +2,6 @@ package org.tastefuljava.messages.xml;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class Messages {
     private String language;
@@ -39,9 +38,5 @@ public class Messages {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Map<String,Message> getMessages() {
-        return new TreeMap<>(messages);
     }
 }

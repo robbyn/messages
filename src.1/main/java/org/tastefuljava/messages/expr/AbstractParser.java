@@ -200,10 +200,10 @@ public abstract class AbstractParser {
                 return a;
             }
             if (a instanceof String)  {
-                return (String)a + b.toString();
+                return b == null ? a : (String)a + b.toString();
             }
             if (b instanceof String)  {
-                return a.toString() + (String)b;
+                return a == null ? a : (String)a + b.toString();
             }
             if (Converter.INSTANCE.isConvertible(a, int.class)
                     && Converter.INSTANCE.isConvertible(b, int.class)) {
@@ -293,20 +293,24 @@ public abstract class AbstractParser {
 
     protected Expression or(Expression e, Expression d) {
         return (c) -> {
-            if (asBoolean(e.evaluate(c))) {
+            Object a = e.evaluate(c);
+            if (a != null && asBoolean(a)) {
                 return Boolean.TRUE;
             } else {
-                return asBoolean(d.evaluate(c));
+                Object b = d.evaluate(c);
+                return b == null ? null : asBoolean(b);
             }
         };
     }
 
     protected Expression and(Expression e, Expression d) {
         return (c) -> {
-            if (!asBoolean(e.evaluate(c))) {
+            Object a = e.evaluate(c);
+            if (a != null && !asBoolean(a)) {
                 return Boolean.FALSE;
             } else {
-                return asBoolean(d.evaluate(c));
+                Object b = d.evaluate(c);
+                return b == null ? null : asBoolean(d.evaluate(c));
             }
         };
     }

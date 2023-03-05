@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT messages (description?,definition*,message*)>
+<!ATTLIST messages
+    prefix CDATA #IMPLIED
+    language CDATA #REQUIRED
+>
+
+<!ELEMENT description (#PCDATA)>
+
+<!ELEMENT definition (#PCDATA)>
+<!ATTLIST definition
+    name CDATA #REQUIRED
+    value CDATA #IMPLIED
+>
+
+<!ELEMENT message (#PCDATA|out|if|choose|list)*>
+<!ATTLIST message
+    name CDATA #REQUIRED
+    generics CDATA #IMPLIED
+    parameters CDATA #IMPLIED
+>
+
+<!ELEMENT if (#PCDATA|out|if|choose|list)*>
+<!ATTLIST if
+    condition CDATA #REQUIRED
+>
+
+<!ELEMENT choose (when+,otherwise?)>
+
+<!ELEMENT when (#PCDATA|out|if|choose|list)*>
+<!ATTLIST when
+    condition CDATA #REQUIRED
+>
+
+<!ELEMENT otherwise (#PCDATA|out|if|choose|list)*>
+
+<!ELEMENT out EMPTY>
+<!ATTLIST out
+    value CDATA #REQUIRED
+>
+
+<!ELEMENT list (#PCDATA|out|if|choose|list)*>
+<!ATTLIST list
+    value CDATA #REQUIRED
+    variable CDATA #REQUIRED
+    separator CDATA #IMPLIED
+>

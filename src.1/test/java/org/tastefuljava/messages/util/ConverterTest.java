@@ -1,6 +1,5 @@
 package org.tastefuljava.messages.util;
 
-import org.tastefuljava.messages.util.Converter;
 import java.io.IOException;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;

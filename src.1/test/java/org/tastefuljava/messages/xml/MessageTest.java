@@ -1,7 +1,5 @@
 package org.tastefuljava.messages.xml;
 
-import org.tastefuljava.messages.xml.Messages;
-import org.tastefuljava.messages.xml.MessageFileLoader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;

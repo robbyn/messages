@@ -153,8 +153,6 @@ public class Reflection {
                         }
                         convArgs[i] = Converter.INSTANCE.convert(arg, type);
                     }
-                    // this is needed in case the class itself is not accessible
-                    method.setAccessible(true);
                     return method.invoke(obj, convArgs);
                 }
             }

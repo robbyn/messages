@@ -1,5 +1,7 @@
 package org.tastefuljava.messages.xml;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.tastefuljava.messages.expr.Expression;
 
 public class MessageBuilder {

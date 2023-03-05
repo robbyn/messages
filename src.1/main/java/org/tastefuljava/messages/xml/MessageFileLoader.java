@@ -24,7 +24,7 @@ public class MessageFileLoader extends DefaultHandler {
             = "-//tastefuljava.org//Message File 1.0//EN";
     private static final String[] EMPTY_LIST = {};
 
-    private final Messages messages;
+    private final Messages messages = new Messages();
     private TextBuilder text;
     private SimpleTextBuilder stext;
     private TextHandler textHandler;
@@ -33,30 +33,24 @@ public class MessageFileLoader extends DefaultHandler {
     private SequenceBuilder sequence;
     private ListBuilder list;
     private ChooseBuilder choose;
+    private String textLanguage;
+    private String definitionName;
     private GenericContext gc;
 
     private final Compiler comp = new Compiler();
     private CompilationContext context = new CompilationContext(
             new StandardContext());
-
-    private MessageFileLoader(Messages messages) {
-        this.messages = messages;
+    {
         context.defineConst("messages", messages);
     }
 
-    public static Messages loadMessages(InputStream stream)
-            throws IOException {
-        return loadMessages(stream, new Messages());
-    }
-
-    public static Messages loadMessages(InputStream stream, Messages messages)
-            throws IOException {
+    public static Messages loadMessages(InputStream stream) throws IOException {
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setValidating(true);
             factory.setNamespaceAware(true);
             SAXParser parser = factory.newSAXParser();
-            MessageFileLoader handler = new MessageFileLoader(messages);
+            MessageFileLoader handler = new MessageFileLoader();
             parser.parse(new InputSource(stream), handler);
             return handler.messages;
         } catch (SAXException | ParserConfigurationException e) {
@@ -102,7 +96,9 @@ public class MessageFileLoader extends DefaultHandler {
             case "definition": {
                 String name = attr(attrs, "name", "");
                 String value = attr(attrs, "value", null);
-                if (value != null) {
+                if (value == null) {
+                    definitionName = name;
+                } else {
                     Expression expr = compileExpr(value);
                     context.define(name, expr);
                 }

@@ -1,10 +1,5 @@
 package org.tastefuljava.messages.expr;
 
-import org.tastefuljava.messages.expr.CompilationContext;
-import org.tastefuljava.messages.expr.Expression;
-import org.tastefuljava.messages.expr.EvaluationContext;
-import org.tastefuljava.messages.expr.StandardContext;
-import org.tastefuljava.messages.expr.Compiler;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -113,6 +108,26 @@ public class ArithmeticTest {
         assertEquals(3, evaln("a[b-1]", integerArray, 3));
         assertEquals(4, evaln("a[b-1]", intList, 4));
         assertEquals(1, evaln("a[b]", intMap, "one"));
+    }
+
+    @Test
+    public void testBooleans() throws IOException {
+        assertEquals(true, evaln("a", true));
+        assertEquals(false, evaln("a", false));
+        assertEquals(false, evaln("!a", true));
+        assertEquals(true, evaln("!a", false));
+        assertEquals(false, evaln("not a", true));
+        assertEquals(true, evaln("not a", false));
+
+        assertEquals(false, evaln("a && b", false, false));
+        assertEquals(false, evaln("a && b", false, true));
+        assertEquals(true, evaln("a && b", true, true));
+        assertEquals(false, evaln("a && b", true, false));
+
+        assertEquals(false, evaln("a || b", false, false));
+        assertEquals(true, evaln("a || b", false, true));
+        assertEquals(true, evaln("a || b", true, true));
+        assertEquals(true, evaln("a || b", true, false));
     }
 
     private Object eval(String s) throws IOException {

@@ -1,7 +1,5 @@
 package org.tastefuljava.messages.expr;
 
-import org.tastefuljava.messages.expr.Compiler;
-import org.tastefuljava.messages.expr.CompilationContext;
 import java.io.IOException;
 import java.util.List;
 import static junit.framework.Assert.assertFalse;

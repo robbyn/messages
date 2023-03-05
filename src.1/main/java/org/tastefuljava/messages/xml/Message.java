@@ -18,15 +18,10 @@ public class Message {
         return name;
     }
 
-    public int getParamCount() {
-        return paramCount;
-    }
-
     public String format(Object... parms) {
         if (parms.length != paramCount) {
             throw new IllegalArgumentException(
-                    "Mauvais nombre de paramètres pour \"" + name
-                            + "\": attendu " + paramCount
+                    "Mauvais nombre de paramètres: attendu " + paramCount
                             + " reçu: " + parms.length);
         }
         EvaluationContext cxt = new EvaluationContext(2);

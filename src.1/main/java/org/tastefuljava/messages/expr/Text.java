@@ -57,7 +57,7 @@ public class Text {
             return null;
         }
         StringBuilder buf = new StringBuilder();
-        buf.append(q);
+        buf.append('"');
         for (char c : chars) {
             switch (c) {
             case '\b':
@@ -72,13 +72,10 @@ public class Text {
             case '\f':
                 buf.append("\\f");
                 break;
-            case '\\':
-                buf.append("\\\\");
-                break;
             default:
                 if (c == q) {
                     buf.append('\\').append(q);
-                } else if (c >= ' ' && c <= 255) {
+                } else if (c >= ' ' && c <= 127) {
                     buf.append(c);
                 } else {
                     buf.append("\\u")
@@ -87,7 +84,7 @@ public class Text {
                 break;
             }
         }
-        buf.append(q);
+        buf.append('"');
         return buf.toString();
     }
 
