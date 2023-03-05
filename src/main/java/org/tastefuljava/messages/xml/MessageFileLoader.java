@@ -24,13 +24,11 @@ public class MessageFileLoader extends DefaultHandler {
     private static final String DTD_SYSTEM_ID = "messages.dtd";
     private static final String DTD_PUBLIC_ID
             = "-//tastefuljava.org//Message File 1.0//EN";
-    private static final String[] EMPTY_LIST = {};
     private static final Pattern RE_FILENAME
-            = Pattern.compile("^.*[\\\\/:]?([^\\\\/:]*)");
+            = Pattern.compile("^(?:.*[\\\\/:])?([^\\\\/:]*)");
 
     private final Messages messages;
     private TextBuilder text;
-    private SimpleTextBuilder stext;
     private TextHandler textHandler;
     private String prefix;
     private MessageBuilder message;
@@ -76,8 +74,8 @@ public class MessageFileLoader extends DefaultHandler {
                 || DTD_SYSTEM_ID.equals(fileName)) {
             InputSource source = new InputSource(
                     getClass().getResourceAsStream(DTD_SYSTEM_ID));
-            source.setPublicId(publicId);
-            source.setSystemId(systemId);
+            source.setPublicId(DTD_PUBLIC_ID);
+            source.setSystemId(DTD_SYSTEM_ID);
             return source;
         }
         return super.resolveEntity(publicId, systemId);
