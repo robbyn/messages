@@ -69,7 +69,7 @@ public class ParameterizedType implements Type {
             return false;
         }
         for (int i = 0; i < actualArgs.length; ++i) {
-            if (!actualArgs[i].isSameThan(other.actualArgs[i])) {
+            if (!actualArgs[i].isSameAs(other.actualArgs[i])) {
                 return false;
             }
         }

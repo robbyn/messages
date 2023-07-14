@@ -24,7 +24,7 @@ public class TypeVariable implements Type {
     }
 
     @Override
-    public boolean isSameThan(Type other) {
+    public boolean isSameAs(Type other) {
         for (Bound bound: bounds) {
             if (!bound.test(other)) {
                 return false;
