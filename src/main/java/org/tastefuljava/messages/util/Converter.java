@@ -31,7 +31,7 @@ public enum Converter {
         }
         Class<?> fromType = value.getClass();
         if (toType.isAssignableFrom(fromType)) {
-            return (T)value;
+            return toType.cast(value);
         }
         ConverterNode node = converterChain(fromType, toType);
         if (node == null) {
@@ -46,8 +46,8 @@ public enum Converter {
         return (T)value;
     }
 
-    public static <T,U> void register(Class<T> fromType, Class<U> toType,
-            Function<T,U> convert) {
+    public static <F,T> void register(Class<F> fromType, Class<T> toType,
+            Function<F,T> convert) {
         Map<Class<?>,Function<?,?>> map = CONVERT.get(toType);
         if (map == null) {
             map = new HashMap<>();
@@ -56,7 +56,8 @@ public enum Converter {
         map.put(fromType, convert);
     }
 
-    private ConverterNode converterChain(Class<?> fromType, Class<?> toType) {
+    private <F,T> ConverterNode<F,?> converterChain(
+            Class<F> fromType, Class<T> toType) {
         List<ConverterNode> list = new ArrayList<>();
         int pos = 0;
         ConverterNode cur = null;
@@ -87,15 +88,15 @@ public enum Converter {
         return cur;
     }
 
-    private static class ConverterNode {
-        private final Class<?> from;
-        private final Function<Object,Object> convert;
-        private final ConverterNode link;
+    private static class ConverterNode<F,T> {
+        private final Class<F> from;
+        private final Function<F,T> convert;
+        private final ConverterNode<T,?> link;
 
-        private ConverterNode(Class<?> from, Function<?,?> convert,
-                ConverterNode link) {
+        private ConverterNode(Class<F> from, Function<F,T> convert,
+                ConverterNode<T,?> link) {
             this.from = from;
-            this.convert = (Function<Object,Object>)convert;
+            this.convert = convert;
             this.link = link;
         }
     }
